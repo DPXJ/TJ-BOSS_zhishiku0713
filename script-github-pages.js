@@ -1,18 +1,18 @@
 // GitHub Pages版本的FastGPT配置
 // 这个版本会调用本地运行的API服务器
 
-// 本地API服务器地址
-const LOCAL_API_BASE = 'http://localhost:3002';
+// Vercel云端API代理地址
+const VERCEL_API_BASE = 'https://boss-zhishiku-vercel.vercel.app';
 
 // 检查是否在本地环境
 const isLocalEnvironment = window.location.hostname === 'localhost' || 
                           window.location.hostname === '127.0.0.1';
 
 // 根据环境选择API基础地址
-const API_BASE = isLocalEnvironment ? '' : LOCAL_API_BASE;
+const API_BASE = isLocalEnvironment ? '' : VERCEL_API_BASE;
 
-console.log('🌐 当前环境:', isLocalEnvironment ? '本地' : 'GitHub Pages');
-console.log('🔗 API基础地址:', API_BASE || '相对路径');
+console.log('🌐 当前环境:', isLocalEnvironment ? '本地' : 'GitHub Pages/Actions');
+console.log('🌐 API_BASE:', API_BASE);
 
 // 修改原有的API调用函数
 async function callStyleAnalysisWorkflow(fileUrls, userUrls) {
@@ -136,7 +136,7 @@ function showEnvironmentInfo() {
     } else {
         infoDiv.innerHTML = `
             ⚠️ GitHub Pages环境<br>
-            🔗 API: ${LOCAL_API_BASE}<br>
+            🔗 API: ${VERCEL_API_BASE}<br>
             💡 需要本地服务器运行
         `;
     }
