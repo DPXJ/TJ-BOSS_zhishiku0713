@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老板专属知识库</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Markdown渲染库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 代码高亮库 -->
+    <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
+    <!-- 阿里云OSS JavaScript SDK -->
+    <script src="https://gosspublic.alicdn.com/aliyun-oss-sdk-6.17.1.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部介绍区域 -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">👑 老板专属知识库</h1>
+                <p class="subtitle">AI学习您的语言风格，快速生成专属内容</p>
+            </div>
+        </header>
+
+        <!-- 主要功能区域 -->
+        <main class="main-content">
+            <!-- 步骤一：风格输入学习 -->
+            <div class="step-section">
+                <div class="step-title">
+                    <div class="step-number">1</div>
+                    <i class="fas fa-brain"></i>
+                    风格输入学习
+                </div>
+                
+                <div class="learning-section">
+                    <!-- 左侧：文件上传区域 -->
+                    <div class="upload-area" style="position:relative;">
+                        <h3 class="upload-title">
+                            <i class="fas fa-file-upload"></i>
+                            上传参考文件
+                        </h3>
+                        <a href="https://tian-jiu-boss-zhishiku.oss-cn-beijing.aliyuncs.com/boss-kb/1751681386551-5niixjqv2-%E9%9B%B7%E5%86%9B.docx" class="copy-test-url-link" id="download-demo-file-link" target="_blank" style="position:absolute;top:10px;right:10px;font-size:10px;color:#27ae60;text-decoration:none;">示例文件：雷军风格（点击下载）</a>
+                        <div class="upload-zone" id="file-upload-zone" onclick="selectFiles()">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>点击上传文件或拖拽到此处</p>
+                                <small>支持 PDF、Word、TXT 等格式，可上传多个文件</small>
+                            </div>
+                        </div>
+                        <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.txt" style="display: none;">
+                        
+                        <!-- 已上传文件列表 -->
+                        <div class="uploaded-files" id="uploaded-files">
+                            <!-- 上传的文件将在这里显示 -->
+                        </div>
+                        
+                        <button class="add-more-btn" onclick="selectFiles()">
+                            <i class="fas fa-plus"></i>
+                            添加更多文件
+                        </button>
+                    </div>
+
+                    <!-- 右侧：URL输入区域 -->
+                    <div class="url-area" style="position:relative;">
+                        <h3 class="upload-title">
+                            <i class="fas fa-link"></i>
+                            添加参考链接
+                        </h3>
+                        <a href="javascript:void(0);" class="copy-test-url-link" id="copy-test-url-link" style="position:absolute;top:10px;right:10px; font-size:10px; color:#999; text-decoration:none; cursor:pointer;">示例（点击复制）：镜哥产品文章</a>
+                        <div class="url-inputs" id="url-inputs">
+                            <!-- 添加的URL将在这里显示 -->
+                        </div>
+                        <button class="add-more-btn" onclick="addUrlInput()">
+                            <i class="fas fa-plus"></i>
+                            添加更多链接
+                        </button>
+                    </div>
+
+                    <!-- 开始AI学习按钮 -->
+                    <div class="ai-learning-section">
+                        <button class="ai-learning-btn" onclick="performStyleAnalysis()" id="start-learning-btn" disabled>
+                            <i class="fas fa-brain"></i>
+                            开始AI学习
+                        </button>
+                        <div class="ai-learning-tip" style="color: #e74c3c; margin-top: 18px; font-size: 0.88rem; text-align: center; font-weight: 500;">
+                            风格学习调用AI分析的维度较多，一般需要3-5分钟，请您耐心等待。
+                        </div>
+                    </div>
+
+                    <!-- <div class="analysis-status">
+                        <div class="status-item">
+                            <i class="fas fa-info-circle status-icon"></i>
+                            <span>等待上传文件或添加链接</span>
+                        </div>
+                        <div class="status-item">
+                            <i class="fas fa-lightbulb status-icon"></i>
+                            <span>等待风格分析...</span>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- 步骤二：输入要求 -->
+            <div class="step-section">
+                <h2 class="step-title">
+                    <span class="step-number">2</span>
+                    <i class="fas fa-edit"></i>
+                    输入生成要求
+                </h2>
+
+                <div class="requirements-form">
+                    <div class="form-group">
+                        <label for="topic">主题 <span class="required">*</span></label>
+                        <input type="text" id="topic" class="form-input" placeholder="请输入要生成内容的主题（必填）" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="word-count">字数要求 <span class="required">*</span></label>
+                        <input type="number" id="word-count" class="form-input" placeholder="请输入字数要求（如：500）" min="50" max="10000" value="500">
+                    </div>
+                    <div class="form-group">
+                        <label for="style-output">内容风格 <span class="required">*</span></label>
+                        <div id="style-output" class="style-display-area">
+                            <!-- 默认风格将在这里显示 -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">补充说明</label>
+                        <textarea id="notes" class="form-textarea" placeholder="请输入补充说明，如特殊要求、重点内容、语调偏好等"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤三：生成内容 -->
+            <div class="step-section">
+                <h2 class="step-title">
+                    <span class="step-number">3</span>
+                    <i class="fas fa-magic"></i>
+                    内容生成
+                </h2>
+
+                <div class="generate-section">
+                    <button class="generate-btn" onclick="generateContent()">
+                        <i class="fas fa-robot"></i>
+                        生成专属内容
+                    </button>
+
+                    <!-- 结果展示区 -->
+                    <div class="result-section" id="result-section" style="display: none;">
+                        <!-- 结果头部卡片 -->
+                        <div class="result-header-card">
+                            <div class="result-header-left">
+                                <h3 class="result-title">
+                                    <i class="fas fa-file-alt"></i>
+                                    生成结果
+                                </h3>
+                                <div class="result-meta">
+                                    <span class="word-count-display" id="word-count-display">约 0 字</span>
+                                    <span class="generation-time">生成时间：<span id="generation-time"></span></span>
+                                </div>
+                            </div>
+                            <div class="result-header-right">
+                                <button class="action-btn edit-btn" title="编辑修改">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn fullscreen-btn" title="全屏查看" onclick="showFullscreenModal()">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                                <button class="action-btn save-btn" title="保存本地">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="action-btn sync-btn" title="同步飞书文档">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 内容展示区 -->
+                        <div class="result-content markdown-content" id="result-content">
+                            <!-- 生成的内容将在这里显示 -->
+                        </div>
+                    </div>
+
+                    <!-- 全屏查看模态框 -->
+                    <div id="fullscreen-modal" class="fullscreen-modal">
+                        <div class="fullscreen-modal-content">
+                            <div class="fullscreen-modal-header">
+                                <h3>
+                                    <i class="fas fa-fingerprint"></i>
+                                    风格分析详情
+                                </h3>
+                                <button class="close-fullscreen-btn" onclick="closeFullscreenModal()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="fullscreen-modal-body markdown-content" id="fullscreen-content">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>&copy; 2025 老板专属知识库 - AI智能写作助手</p>
+        </footer>
+    </div>
+
+    <!-- 设置按钮 -->
+    <div class="settings-btn" onclick="showConfigModal()">
+        <i class="fas fa-cog"></i>
+    </div>
+
+    <!-- 配置模态框 -->
+    <!-- 删除原有的 config-modal 静态弹窗代码，全部交由 JS 动态创建和控制 -->
+    
+    <!-- 隐私按钮 -->
+    <div class="privacy-btn" onclick="showPrivacyModal()">
+        <i class="fas fa-shield-alt"></i>
+    </div>
+
+    <!-- 隐私弹窗 -->
+    <div class="privacy-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> 配置信息</h3>
+                <button class="close-modal-btn" onclick="closePrivacyModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <!-- 参考文章URL链接 -->
+                <div class="info-section">
+                    <h4>参考文章URL链接</h4>
+                    <div class="info-item">
+                        <span class="info-text">https://www.takungpao.com/house/dichan/2025/0604/1092529.html</span>
+                        <button class="copy-btn" data-text="https://www.takungpao.com/house/dichan/2025/0604/1092529.html">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-text">https://www.takungpao.com/tech/internet/2025/0623/1097834.html</span>
+                        <button class="copy-btn" data-text="https://www.takungpao.com/tech/internet/2025/0623/1097834.html">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-text">https://www.takungpao.com/tech/internet/2025/0619/1096801.html</span>
+                        <button class="copy-btn" data-text="https://www.takungpao.com/tech/internet/2025/0619/1096801.html">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- FastGPT配置部分 -->
+                <div style="margin-bottom: 30px;">
+                  <h4 style="color: #333; margin-bottom: 20px; font-size: 1.1rem; border-bottom: 2px solid #f1f3f4; padding-bottom: 10px;">
+                    ⚙️ FastGPT配置
+                  </h4>
+                  <!-- API密钥已写死在代码中，无需输入 -->
+                  <div style="margin-bottom: 20px; padding: 15px; background-color: #e8f5e8; border-radius: 8px; border-left: 4px solid #28a745;">
+                    <p style="margin: 0; color: #155724; font-size: 0.9rem;">
+                      <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+                      <strong>API密钥已配置：</strong>风格分析和内容生成的API密钥已写死在代码中，无需手动输入。
+                    </p>
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                      <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">风格分析工作流ID</label>
+                      <input type="text" id="style-workflow-id-dynamic" style="
+                        padding: 12px 15px;
+                        border: 2px solid #e9ecef;
+                        border-radius: 8px;
+                        font-size: 1rem;
+                        width: 100%;
+                        box-sizing: border-box;" placeholder="风格分析工作流ID">
+                    </div>
+                    <div>
+                      <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">内容生成工作流ID</label>
+                      <input type="text" id="content-workflow-id-dynamic" style="
+                        padding: 12px 15px;
+                        border: 2px solid #e9ecef;
+                        border-radius: 8px;
+                        font-size: 1rem;
+                        width: 100%;
+                        box-sizing: border-box;" placeholder="内容生成工作流ID">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- 阿里云OSS配置 -->
+                <div class="info-section">
+                    <h4>阿里云OSS配置</h4>
+                    <div class="info-item">
+                        <span class="info-label">KEY：</span>
+                        <span class="info-text">**************</span>
+                        <button class="copy-btn" data-text="**************">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">ID：</span>
+                        <span class="info-text">**************</span>
+                        <button class="copy-btn" data-text="**************">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 替换主脚本为GitHub Pages专用版本，支持Vercel代理API -->
+    <script src="script-github-pages.js"></script>
+</body>
+</html> 

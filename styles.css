@@ -1,0 +1,1404 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    line-height: 1.6;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 头部样式 */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-content {
+    position: relative;
+}
+
+.title {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.title i {
+    color: #ffd700;
+    margin-right: 15px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin: 0;
+}
+
+/* 主要内容区域 */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* 步骤区域 */
+.step-section {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.step-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.step-number {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.step-title i {
+    color: #667eea;
+}
+
+/* 学习区域样式 */
+.learning-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.upload-area, .url-area {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 25px;
+    border: 2px dashed #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover, .url-area:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.upload-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.upload-title i {
+    color: #667eea;
+}
+
+.upload-zone {
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.upload-zone:hover {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.upload-placeholder i {
+    font-size: 3rem;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.upload-placeholder p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.upload-placeholder small {
+    color: #999;
+}
+
+/* 文件列表样式 */
+.uploaded-files {
+    margin-bottom: 15px;
+}
+
+.file-item, .url-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.file-item:hover, .url-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-item i {
+    font-size: 1.2rem;
+    color: #667eea;
+}
+
+.filename {
+    flex: 1;
+    color: #333;
+    font-weight: 500;
+}
+
+.url-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    color: #333;
+    background: transparent;
+}
+
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+}
+
+.add-more-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.add-more-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+/* AI学习按钮样式 */
+.ai-learning-section {
+    margin-top: 20px;
+    text-align: center;
+    grid-column: 1 / -1;
+}
+
+.ai-learning-btn {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+    margin-bottom: 20px;
+}
+
+.ai-learning-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5f3dc4, #9775fa);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+}
+
+.ai-learning-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.ai-learning-btn i {
+    font-size: 18px;
+}
+
+/* 分析状态 */
+.analysis-status {
+    grid-column: 1 / -1;
+    background: #e8f5e8;
+    border-radius: 10px;
+    padding: 20px;
+    border-left: 4px solid #28a745;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.status-item:last-child {
+    margin-bottom: 0;
+}
+
+.status-icon {
+    font-size: 1.2rem;
+}
+
+.status-icon.success {
+    color: #28a745;
+}
+
+/* 表单样式 */
+.requirements-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 1rem;
+    color: #222;
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+}
+.required {
+    color: #e53935;
+    font-size: 1em;
+    margin-left: 2px;
+}
+/* 移除风格分析卡片样式，仅保留内容本身 */
+.style-analysis-container,
+.style-analysis-header,
+.style-analysis-content {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+#style-output {
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    background: none;
+    margin: 0 0 16px 0;
+}
+#style-output .markdown-content {
+    padding: 0;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #333;
+}
+
+.form-input, .form-select, .form-textarea {
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    background: white;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* 生成区域 */
+.generate-section {
+    text-align: center;
+}
+
+.generate-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.generate-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
+}
+
+.generate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.generate-btn.loading {
+    background: #4CAF50;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.generate-btn.loading:hover {
+    background: #4CAF50;
+    transform: none;
+}
+
+/* 结果展示区 */
+.result-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 风格分析结果容器 */
+.style-analysis-container {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 风格分析结果标题栏 */
+.style-analysis-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    border: none;
+    background: none;
+    border-radius: 0;
+    margin-bottom: 8px;
+}
+.style-analysis-header .action-btn,
+.style-analysis-header .fullscreen-btn {
+    margin-left: 6px;
+    font-size: 0.95rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid #d0d7de;
+    background: #fff;
+    color: #222;
+    transition: background 0.2s, color 0.2s;
+    min-width: 80px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+.style-analysis-header .action-btn i,
+.style-analysis-header .fullscreen-btn i {
+    margin-right: 4px;
+}
+.style-analysis-header .action-btn:hover,
+.style-analysis-header .fullscreen-btn:hover {
+    background: #f3f4f6;
+    color: #222;
+}
+.style-analysis-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    border: none;
+    background: none;
+    border-radius: 0;
+    margin-bottom: 8px;
+}
+.style-analysis-header .action-btn + .action-btn,
+.style-analysis-header .action-btn + .fullscreen-btn,
+.style-analysis-header .fullscreen-btn + .action-btn {
+    margin-left: 8px;
+}
+
+.style-analysis-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.style-analysis-header h3 i {
+    color: #667eea;
+}
+
+/* 风格分析内容区域 */
+.style-analysis-content {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    text-align: left;
+}
+
+/* 原始输出区域样式 */
+#fastgpt-raw-output {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid #e9ecef;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: left;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* 调试区域标题 */
+.debug-section-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* Markdown 内容样式优化 */
+.markdown-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+    text-align: left;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #2c3e50;
+}
+
+.markdown-content p {
+    margin: 0.5em 0;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+    padding-left: 2em;
+    margin: 0.5em 0;
+}
+
+.markdown-content li {
+    margin: 0.3em 0;
+}
+
+.markdown-content code {
+    background: #f5f7f9;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 0.9em;
+    color: #476582;
+}
+
+.markdown-content pre {
+    padding: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f6f8fa;
+    border-radius: 3px;
+}
+
+.markdown-content pre code {
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    border: 0;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #667eea;
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    background: #f8f9fa;
+    color: #666;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+}
+
+/* 全屏模态框 */
+.fullscreen-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.fullscreen-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.fullscreen-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+/* 模态框主体 */
+.modal-body {
+    padding: 30px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.config-section {
+    margin-bottom: 30px;
+}
+
+.config-section h4 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #f1f3f4;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.config-section h4::before {
+    content: "⚙️";
+}
+
+/* 模态框底部 */
+.modal-footer {
+    background: #f8f9fa;
+    padding: 20px 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+/* 模态框遮罩层样式 */
+.modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10000 !important;
+}
+
+#config-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 10000 !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#config-modal[style*="display: flex"] {
+    display: flex !important;
+}
+
+/* 配置模态框内容样式 */
+.modal-overlay .modal-content {
+    background: white;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-overlay .modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-overlay .modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-overlay .modal-body {
+    padding: 20px;
+}
+
+.modal-overlay .modal-footer {
+    background: #f8f9fa;
+    padding: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    border-top: 1px solid #eee;
+}
+
+.modal-overlay .close-btn {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay .close-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: rotate(90deg);
+}
+
+/* 设置按钮样式 */
+.settings-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    z-index: 999;
+    animation: rotate 8s linear infinite;
+}
+
+.settings-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.settings-btn i {
+    font-size: 24px;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Toast 提示样式 */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 10000;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.3s ease;
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+}
+
+.toast.warning {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: #212529;
+}
+
+.toast.info {
+    background: linear-gradient(135deg, #17a2b8, #6f42c1);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* 配置模态框响应式 */
+@media (max-width: 768px) {
+    .settings-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 16px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px;
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+} 
+
+/* 优化表情图标显示 */
+.markdown-content em {
+    font-style: normal;
+    color: #666;
+}
+
+.markdown-content strong {
+    color: #2c3e50;
+}
+
+/* 调整结果区域样式 */
+.result-content {
+    max-height: 500px;
+    overflow-y: auto;
+    margin: 20px 0;
+    position: relative;
+}
+
+/* 结果区域样式 */
+.result-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.result-header-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+}
+
+.result-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.result-title {
+    font-size: 1.4rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.result-title i {
+    color: #667eea;
+}
+
+.result-meta {
+    display: flex;
+    gap: 15px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.result-header-right {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #666;
+}
+
+.action-btn:hover {
+    background: #f5f5f5;
+    color: #667eea;
+    border-color: #667eea;
+}
+
+.action-btn i {
+    font-size: 1.1rem;
+}
+
+.result-content-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.result-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+    padding: 20px 0;
+}
+
+.result-content.editable {
+    padding: 15px;
+    background-color: #fff;
+    outline: none;
+}
+
+/* 确保markdown内容样式正确 */
+.markdown-content {
+    font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.markdown-content h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.markdown-content p {
+    margin-bottom: 1rem;
+}
+
+.result-content.editable:focus {
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .result-header-card {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .result-header-right {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        padding: 6px;
+    }
+} 
+
+/* 优化滚动条样式 */
+.style-analysis-content::-webkit-scrollbar,
+#fastgpt-raw-output::-webkit-scrollbar {
+    width: 8px;
+}
+
+.style-analysis-content::-webkit-scrollbar-track,
+#fastgpt-raw-output::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.style-analysis-content::-webkit-scrollbar-thumb,
+#fastgpt-raw-output::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.style-analysis-content::-webkit-scrollbar-thumb:hover,
+#fastgpt-raw-output::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* 动画效果 */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fullscreen-modal-content {
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+/* 添加全屏查看按钮 */
+.fullscreen-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.fullscreen-btn:hover {
+    background: #5a6fd6;
+}
+
+.fullscreen-btn i {
+    font-size: 1em;
+} 
+
+/* 隐私按钮样式 */
+.privacy-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.privacy-btn i {
+    font-size: 20px;
+    color: #6c5ce7;
+}
+
+.privacy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* 弹窗样式 */
+.privacy-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header h3 i {
+    color: #6c5ce7;
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+
+.close-modal-btn:hover {
+    color: #333;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.info-section {
+    margin-bottom: 20px;
+}
+
+.info-section h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.info-label {
+    color: #666;
+    min-width: 120px;
+}
+
+.info-text {
+    flex: 1;
+    font-family: monospace;
+    word-break: break-all;
+}
+
+.copy-btn {
+    background: #6c5ce7;
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: #5b4cc4;
+    transform: translateY(-2px);
+}
+
+.copy-btn.success {
+    background: #28a745;
+}
+
+.divider {
+    height: 1px;
+    background: #eee;
+    margin: 30px 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .info-label {
+        min-width: auto;
+        margin-bottom: 5px;
+    }
+
+    .copy-btn {
+        align-self: flex-end;
+    }
+}
+
+/* 滚动条美化 */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+} 
+
+.copy-test-url-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: 1px solid #d0d7de;
+    color: #667eea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    z-index: 2;
+}
+.copy-test-url-btn:hover {
+    background: #e0e7ff;
+    color: #3b4cca;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.12);
+} 
+
+.copy-test-url-link {
+    color: #27ae60 !important;
+    text-decoration: none;
+    font-size: 10px;
+    position: absolute;
+    right: 10px;
+    top: 60px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.copy-test-url-link:hover {
+    color: #337ab7 !important;
+    text-decoration: underline !important;
+} 

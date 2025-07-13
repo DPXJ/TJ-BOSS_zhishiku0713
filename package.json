@@ -1,0 +1,22 @@
+{
+  "name": "fastgpt-proxy",
+  "version": "1.0.0",
+  "description": "FastGPT API 代理服务器",
+  "main": "proxy-server.js",
+  "scripts": {
+    "start": "node proxy-server.js",
+    "start:sdk": "node fastgpt-sdk-server.js",
+    "dev": "nodemon proxy-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["fastgpt", "proxy", "api"],
+  "author": "Assistant",
+  "license": "MIT"
+} 
