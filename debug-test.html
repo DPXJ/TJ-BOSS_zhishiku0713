@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调试测试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>调试测试页面</h1>
+    
+    <div class="debug-section">
+        <h2>当前状态检查</h2>
+        <button onclick="checkAppState()">检查appState</button>
+        <button onclick="checkFunctions()">检查函数</button>
+        <button onclick="simulateFileUpload()">模拟文件上传</button>
+        <button onclick="testPerformStyleAnalysis()">测试performStyleAnalysis</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>调试日志</h2>
+        <div id="debug-log" class="log"></div>
+    </div>
+    
+    <script>
+        // 简化的appState用于测试
+        const appState = {
+            uploadedFiles: [],
+            urls: [],
+            fileUrls: [],
+            styleOutput: null,
+            generatedContent: null,
+            isUploading: false,
+            isAnalyzing: false,
+            isGenerating: false,
+            chatId: null
+        };
+        
+        function log(message) {
+            const logDiv = document.getElementById('debug-log');
+            logDiv.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            console.log(message);
+        }
+        
+        function checkAppState() {
+            log('🔍 检查appState:');
+            log('- fileUrls: ' + JSON.stringify(appState.fileUrls));
+            log('- urls: ' + JSON.stringify(appState.urls));
+            log('- uploadedFiles: ' + JSON.stringify(appState.uploadedFiles));
+            log('- isAnalyzing: ' + appState.isAnalyzing);
+        }
+        
+        function checkFunctions() {
+            log('🔍 检查函数是否存在:');
+            log('- typeof performStyleAnalysis: ' + typeof performStyleAnalysis);
+            log('- typeof collectAllUrls: ' + typeof collectAllUrls);
+            log('- typeof checkLearningButtonStatus: ' + typeof checkLearningButtonStatus);
+        }
+        
+        function simulateFileUpload() {
+            log('🔍 模拟文件上传:');
+            appState.fileUrls = ['https://example.com/test1.pdf', 'https://example.com/test2.docx'];
+            appState.uploadedFiles = [
+                { name: 'test1.pdf', type: 'pdf', size: 1024, url: 'https://example.com/test1.pdf' },
+                { name: 'test2.docx', type: 'word', size: 2048, url: 'https://example.com/test2.docx' }
+            ];
+            log('- 模拟上传完成');
+            checkAppState();
+        }
+        
+        function testPerformStyleAnalysis() {
+            log('🔍 测试performStyleAnalysis函数:');
+            if (typeof performStyleAnalysis === 'function') {
+                try {
+                    performStyleAnalysis();
+                    log('- 函数调用成功');
+                } catch (error) {
+                    log('- 函数调用失败: ' + error.message);
+                }
+            } else {
+                log('- performStyleAnalysis函数不存在');
+            }
+        }
+        
+        // 简化的collectAllUrls函数
+        function collectAllUrls() {
+            log('🔍 collectAllUrls被调用');
+        }
+        
+        // 简化的checkLearningButtonStatus函数
+        function checkLearningButtonStatus() {
+            log('🔍 checkLearningButtonStatus被调用');
+        }
+        
+        // 简化的performStyleAnalysis函数用于测试
+        function performStyleAnalysis() {
+            log('🔍 performStyleAnalysis函数开始执行');
+            log('🔍 当前 appState.fileUrls: ' + JSON.stringify(appState.fileUrls));
+            log('🔍 当前 appState.urls: ' + JSON.stringify(appState.urls));
+            
+            collectAllUrls();
+            
+            if (!Array.isArray(appState.fileUrls)) appState.fileUrls = [];
+            if (!Array.isArray(appState.urls)) appState.urls = [];
+            const article_input = Array.isArray(appState.fileUrls) ? [...appState.fileUrls] : [];
+            const url_input = Array.isArray(appState.urls) ? [...appState.urls] : [];
+            
+            log('🔍 处理后的变量:');
+            log('🔍 article_input: ' + JSON.stringify(article_input));
+            log('🔍 url_input: ' + JSON.stringify(url_input));
+            log('🔍 article_input.length: ' + article_input.length);
+            log('🔍 url_input.length: ' + url_input.length);
+            
+            if (article_input.length === 0 && url_input.length === 0) {
+                log('🔍 没有文件和链接，退出函数');
+                return;
+            }
+            
+            log('🔍 开始风格分析流程');
+            appState.isAnalyzing = true;
+            
+            // 模拟API调用
+            setTimeout(() => {
+                log('🔍 模拟API调用完成');
+                appState.isAnalyzing = false;
+            }, 2000);
+        }
+    </script>
+</body>
+</html> 

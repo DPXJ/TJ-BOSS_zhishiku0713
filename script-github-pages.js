@@ -9,8 +9,8 @@ const isLocalEnvironment = window.location.hostname === 'localhost' ||
                           window.location.hostname === '127.0.0.1';
 
 // 根据环境选择API基础地址
-// 临时方案：直接调用FastGPT API，绕过Vercel代理
-const API_BASE = isLocalEnvironment ? '' : '';
+// 本地环境使用代理服务器，其他环境直接调用FastGPT API
+const API_BASE = isLocalEnvironment ? 'http://localhost:3001/api/fastgpt' : '';
 
 console.log('🌐 当前环境:', isLocalEnvironment ? '本地' : 'GitHub Pages/Actions');
 console.log('🌐 API_BASE:', API_BASE);
@@ -27,13 +27,13 @@ let API_CONFIG = {
     },
     // FastGPT配置 - 风格分析
     FASTGPT_STYLE: {
-        baseUrl: 'https://api.fastgpt.in/api', // FastGPT官方API地址
+        baseUrl: isLocalEnvironment ? 'http://localhost:3001/api/fastgpt' : 'https://api.fastgpt.in/api', // 根据环境选择API地址
         apiKey: 'fastgpt-uWWVnoPpJIc57h6BiLumhzeyk89gfyPmQCCYn8R214C71i6tL6Pa5Gsov7NnIYH', // 写死的风格分析密钥
         workflowId: '685f87df49b71f158b57ae61' // 风格分析工作流ID（已修正）
     },
     // FastGPT配置 - 内容生成
     FASTGPT_CONTENT: {
-        baseUrl: 'https://api.fastgpt.in/api', // FastGPT官方API地址
+        baseUrl: isLocalEnvironment ? 'http://localhost:3001/api/fastgpt' : 'https://api.fastgpt.in/api', // 根据环境选择API地址
         apiKey: 'fastgpt-p2WSK5LRZZM3tVzk0XRT4vERkQ2PYLXi6rFAZdHzzuB7mSicDLRBXiymej', // 写死的内容生成密钥
         workflowId: '685c9d7e6adb97a0858caaa6' // 内容创作工作流ID（已修正）
     },
@@ -148,12 +148,15 @@ function checkLearningButtonStatus() {
     if (button) {
         const hasFiles = appState.uploadedFiles.length > 0;
         const hasUrls = appState.urls.length > 0;
-        const isProcessing = appState.isUploading || appState.isAnalyzing || appState.isGenerating;
+        // 移除isUploading状态检查，只在真正执行AI学习时才改变按钮状态
+        const isProcessing = appState.isAnalyzing || appState.isGenerating;
         
         button.disabled = !(hasFiles || hasUrls) || isProcessing;
         
-        if (isProcessing) {
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
+        if (appState.isAnalyzing) {
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI学习中...';
+        } else if (appState.isGenerating) {
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
         } else {
             button.innerHTML = '<i class="fas fa-brain"></i> 开始AI学习';
         }
@@ -220,8 +223,11 @@ async function callStyleAnalysisWorkflow(fileUrls, userUrls) {
         throw new Error('风格分析工作流ID未配置，请先配置workflowId');
     }
     
-    // 直接调用FastGPT API
-    const response = await fetch(`https://api.fastgpt.in/api/workflow/run`, {
+    // 根据环境选择API地址
+    const apiUrl = `${API_CONFIG.FASTGPT_STYLE.baseUrl}/workflow/run`;
+    console.log('🔗 调用工作流API地址:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -280,8 +286,11 @@ async function callContentGenerationWorkflow(styleOutput, contentLength, topic, 
         }
     };
     
-    // 直接调用FastGPT API
-    const response = await fetch(`https://api.fastgpt.in/api/v1/chat/completions`, {
+    // 根据环境选择API地址
+    const apiUrl = `${API_CONFIG.FASTGPT_CONTENT.baseUrl}/v1/chat/completions`;
+    console.log('🔗 调用内容生成工作流API地址:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -364,6 +373,12 @@ function selectFiles() {
             
             // 更新文件URL数组
             appState.fileUrls.push(...fileUrls);
+            
+            // 添加调试日志
+            console.log('🔍 [调试] 文件上传成功后的状态:');
+            console.log('🔍 [调试] fileUrls (新上传):', fileUrls);
+            console.log('🔍 [调试] appState.fileUrls (累积):', appState.fileUrls);
+            console.log('🔍 [调试] appState.uploadedFiles.length:', appState.uploadedFiles.length);
             
             // 显示成功提示
             showToast(`✅ 成功上传 ${files.length} 个文件`, 'success');
@@ -500,18 +515,39 @@ function collectAllUrls() {
 
 // 执行风格分析（只在按钮点击时触发，变量名严格一致，始终传递数组）
 async function performStyleAnalysis() {
+    // 添加详细调试日志
+    console.log('🔍 [调试] performStyleAnalysis 函数开始执行');
+    console.log('🔍 [调试] 当前 appState.fileUrls:', appState.fileUrls);
+    console.log('🔍 [调试] 当前 appState.urls:', appState.urls);
+    
     collectAllUrls();
+    
+    console.log('🔍 [调试] collectAllUrls 执行后:');
+    console.log('🔍 [调试] appState.fileUrls:', appState.fileUrls);
+    console.log('🔍 [调试] appState.urls:', appState.urls);
+    
     if (!Array.isArray(appState.fileUrls)) appState.fileUrls = [];
     if (!Array.isArray(appState.urls)) appState.urls = [];
     const article_input = Array.isArray(appState.fileUrls) ? [...appState.fileUrls] : [];
     const url_input = Array.isArray(appState.urls) ? [...appState.urls] : [];
+    
+    console.log('🔍 [调试] 处理后的变量:');
+    console.log('🔍 [调试] article_input:', article_input);
+    console.log('🔍 [调试] url_input:', url_input);
+    console.log('🔍 [调试] article_input.length:', article_input.length);
+    console.log('🔍 [调试] url_input.length:', url_input.length);
+    
     if (article_input.length === 0 && url_input.length === 0) {
+        console.log('🔍 [调试] 没有文件和链接，退出函数');
         showToast('请先上传文件或添加链接', 'info');
         return;
     }
+    
+    console.log('🔍 [调试] 开始风格分析流程');
     appState.isAnalyzing = true;
     updateAnalysisStatus('正在分析风格...');
     showToast('正在调用FastGPT API进行风格分析，请稍候...', 'info');
+    
     // 动态插入红色提示
     const aiTipId = 'ai-learning-tip-dynamic';
     let aiTip = document.getElementById(aiTipId);
@@ -534,16 +570,13 @@ async function performStyleAnalysis() {
     try {
         let styleOutput;
         let debugRaw = {};
-        // 关键优化：只要有文件就强制走workflow
-        if (article_input.length > 0) {
-            const result = await callStyleAnalysisWorkflowRaw(article_input, url_input);
-            styleOutput = result.style_output;
-            debugRaw = result;
-        } else if (API_CONFIG.MODE === 'workflow') {
+        // 修复：统一使用chat接口，无论是文件还是URL
+        if (API_CONFIG.MODE === 'workflow') {
             const result = await callStyleAnalysisWorkflowRaw(article_input, url_input);
             styleOutput = result.style_output;
             debugRaw = result;
         } else {
+            // 统一使用chat接口处理文件和URL
             const chatResponse = await analyzeStyleWithChatRaw(article_input, url_input);
             styleOutput = chatResponse.style_output || chatResponse.content;
             debugRaw = chatResponse.raw || { style_output: styleOutput };
@@ -572,8 +605,11 @@ async function performStyleAnalysis() {
 async function callStyleAnalysisWorkflowRaw(fileUrls, userUrls) {
     const safeFileUrls = Array.isArray(fileUrls) ? fileUrls : [];
     const safeUserUrls = Array.isArray(userUrls) ? userUrls : [];
-    // 直接调用FastGPT API
-    const response = await fetch(`https://api.fastgpt.in/api/workflow/run`, {
+    // 根据环境选择API地址
+    const apiUrl = `${API_CONFIG.FASTGPT_STYLE.baseUrl}/workflow/run`;
+    console.log('🔗 调用API地址:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -634,8 +670,11 @@ async function callChatCompletionsRaw(messages, chatId, variables, apiKey, workf
         variables: variables || {}
     };
     
-    // 直接调用FastGPT API
-    const response = await fetch(`https://api.fastgpt.in/api/v1/chat/completions`, {
+    // 根据环境选择API地址
+    const apiUrl = `${API_CONFIG.FASTGPT_STYLE.baseUrl}/v1/chat/completions`;
+    console.log('🔗 调用对话API地址:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -699,8 +738,11 @@ async function callChatCompletions(messages, chatId, variables, apiKey, workflow
         variables: variables || {}
     };
     
-    // 直接调用FastGPT API
-    const response = await fetch(`https://api.fastgpt.in/api/v1/chat/completions`, {
+    // 根据环境选择API地址
+    const apiUrl = `${API_CONFIG.FASTGPT_STYLE.baseUrl}/v1/chat/completions`;
+    console.log('🔗 调用对话API地址:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -744,8 +786,11 @@ async function callContentGenerationChatCompletions(messages, chatId, variables,
         variables: variables || {}
     };
     
-    // 直接调用FastGPT API
-    const response = await fetch(`https://api.fastgpt.in/api/v1/chat/completions`, {
+    // 根据环境选择API地址
+    const apiUrl = `${API_CONFIG.FASTGPT_CONTENT.baseUrl}/v1/chat/completions`;
+    console.log('🔗 调用内容生成API地址:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -1002,28 +1047,34 @@ function loadConfigFromStorage() {
                 parsedConfig.FASTGPT_CONTENT = JSON.parse(parsedConfig.FASTGPT_CONTENT);
             }
             
-            // 保存写死的API密钥，不被localStorage覆盖
+            // 保存写死的配置，不被localStorage覆盖
             const hardcodedStyleKey = API_CONFIG.FASTGPT_STYLE.apiKey;
             const hardcodedContentKey = API_CONFIG.FASTGPT_CONTENT.apiKey;
+            const hardcodedStyleBaseUrl = API_CONFIG.FASTGPT_STYLE.baseUrl;
+            const hardcodedContentBaseUrl = API_CONFIG.FASTGPT_CONTENT.baseUrl;
             
             API_CONFIG = { ...API_CONFIG, ...parsedConfig };
             
-            // 强制恢复写死的API密钥
+            // 强制恢复写死的配置
             API_CONFIG.FASTGPT_STYLE.apiKey = hardcodedStyleKey;
             API_CONFIG.FASTGPT_CONTENT.apiKey = hardcodedContentKey;
+            API_CONFIG.FASTGPT_STYLE.baseUrl = hardcodedStyleBaseUrl;
+            API_CONFIG.FASTGPT_CONTENT.baseUrl = hardcodedContentBaseUrl;
             
             // 再次强制修正
             console.log('[DEBUG] 合并后 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);
             if (typeof API_CONFIG.FASTGPT_STYLE === 'string') {
                 API_CONFIG.FASTGPT_STYLE = JSON.parse(API_CONFIG.FASTGPT_STYLE);
                 API_CONFIG.FASTGPT_STYLE.apiKey = hardcodedStyleKey; // 恢复写死的密钥
+                API_CONFIG.FASTGPT_STYLE.baseUrl = hardcodedStyleBaseUrl; // 恢复写死的baseUrl
             }
             if (typeof API_CONFIG.FASTGPT_CONTENT === 'string') {
                 API_CONFIG.FASTGPT_CONTENT = JSON.parse(API_CONFIG.FASTGPT_CONTENT);
                 API_CONFIG.FASTGPT_CONTENT.apiKey = hardcodedContentKey; // 恢复写死的密钥
+                API_CONFIG.FASTGPT_CONTENT.baseUrl = hardcodedContentBaseUrl; // 恢复写死的baseUrl
             }
             console.log('[DEBUG] 修正后 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);
-            console.log('✅ 配置已从本地存储加载（API密钥保持写死状态）');
+            console.log('✅ 配置已从本地存储加载（API密钥和baseUrl保持写死状态）');
         } catch (error) {
             console.error('❌ 配置加载失败:', error);
         }
@@ -1354,14 +1405,14 @@ function saveConfigDynamic() {
             API_CONFIG.FASTGPT_CONTENT = JSON.parse(API_CONFIG.FASTGPT_CONTENT);
         }
     } catch(e) {
-        // API密钥保持写死状态
+        // API密钥和baseUrl保持写死状态
         API_CONFIG.FASTGPT_STYLE = { 
-            baseUrl: 'https://api.fastgpt.in/api', 
+            baseUrl: isLocalEnvironment ? 'http://localhost:3001/api/fastgpt' : 'https://api.fastgpt.in/api', 
             apiKey: 'fastgpt-uWWVnoPpJIc57h6BiLumhzeyk89gfyPmQCCYn8R214C71i6tL6Pa5Gsov7NnIYH', 
             workflowId: '685f87df49b71f158b57ae61' 
         };
         API_CONFIG.FASTGPT_CONTENT = { 
-            baseUrl: 'https://api.fastgpt.in/api', 
+            baseUrl: isLocalEnvironment ? 'http://localhost:3001/api/fastgpt' : 'https://api.fastgpt.in/api', 
             apiKey: 'fastgpt-p2WSK5LRZZM3tVzk0XRT4vERkQ2PYLXi6rFAZdHzzuB7mSicDLRBXiymej', 
             workflowId: '685c9d7e6adb97a0858caaa6' 
         };
