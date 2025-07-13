@@ -2,6 +2,12 @@
 
 一个专门用于模仿老板语言风格的AI写作助手前端演示页面。
 
+## 🌐 在线访问
+
+**GitHub Pages 部署地址：** https://dpxj.github.io/TJ-BOSS_zhishiku0713/
+
+> 注意：由于GitHub Pages是静态托管，代理服务器功能需要单独部署。建议在本地运行 `npm start` 来启动完整的代理服务。
+
 ## 功能特点
 
 ### 🎯 核心功能
