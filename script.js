@@ -1987,13 +1987,11 @@ window.quickSetup = function() {
 // 配置模态框相关函数
 function showConfigModal() {
     console.log('📋 显示配置界面');
-    
     // 先移除可能存在的旧模态框
     const existingModal = document.getElementById('config-modal-dynamic');
     if (existingModal) {
         existingModal.remove();
     }
-    
     // 创建模态框
     const modal = document.createElement('div');
     modal.id = 'config-modal-dynamic';
@@ -2009,8 +2007,7 @@ function showConfigModal() {
         justify-content: center;
         z-index: 10000;
     `;
-    
-    // 创建模态框内容
+    // 创建模态框内容（隐藏ID、Bucket、地域输入框）
     modal.innerHTML = `
         <div style="
             background: white;
@@ -2052,43 +2049,29 @@ function showConfigModal() {
                     <h4 style="color: #333; margin-bottom: 20px; font-size: 1.1rem; border-bottom: 2px solid #f1f3f4; padding-bottom: 10px;">
                         ⚙️ FastGPT配置
                     </h4>
-                    <div style="margin-bottom: 20px;">
-                        <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">API密钥</label>
-                        <input type="password" id="fastgpt-apikey-dynamic" style="
-                            padding: 12px 15px;
-                            border: 2px solid #e9ecef;
-                            border-radius: 8px;
-                            font-size: 1rem;
-                            width: 100%;
-                            box-sizing: border-box;
-                        " placeholder="请输入FastGPT API密钥">
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                         <div>
-                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">风格分析工作流ID</label>
-                            <input type="text" id="style-workflow-id-dynamic" style="
+                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">风格分析API密钥</label>
+                            <input type="password" id="style-api-key-dynamic" style="
                                 padding: 12px 15px;
                                 border: 2px solid #e9ecef;
                                 border-radius: 8px;
                                 font-size: 1rem;
                                 width: 100%;
-                                box-sizing: border-box;
-                            " placeholder="风格分析工作流ID">
+                                box-sizing: border-box;" placeholder="风格分析API密钥">
                         </div>
                         <div>
-                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">内容生成工作流ID</label>
-                            <input type="text" id="content-workflow-id-dynamic" style="
+                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">内容生成API密钥</label>
+                            <input type="password" id="content-api-key-dynamic" style="
                                 padding: 12px 15px;
                                 border: 2px solid #e9ecef;
                                 border-radius: 8px;
                                 font-size: 1rem;
                                 width: 100%;
-                                box-sizing: border-box;
-                            " placeholder="内容生成工作流ID">
+                                box-sizing: border-box;" placeholder="内容生成API密钥">
                         </div>
                     </div>
                 </div>
-                
                 <div style="margin-bottom: 30px;">
                     <h4 style="color: #333; margin-bottom: 20px; font-size: 1.1rem; border-bottom: 2px solid #f1f3f4; padding-bottom: 10px;">
                         ☁️ 阿里云OSS配置
@@ -2102,8 +2085,7 @@ function showConfigModal() {
                                 border-radius: 8px;
                                 font-size: 1rem;
                                 width: 100%;
-                                box-sizing: border-box;
-                            " placeholder="阿里云OSS Access Key ID">
+                                box-sizing: border-box;" placeholder="阿里云OSS Access Key ID">
                         </div>
                         <div>
                             <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">Access Key Secret</label>
@@ -2113,32 +2095,7 @@ function showConfigModal() {
                                 border-radius: 8px;
                                 font-size: 1rem;
                                 width: 100%;
-                                box-sizing: border-box;
-                            " placeholder="阿里云OSS Access Key Secret">
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div>
-                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">Bucket名称</label>
-                            <input type="text" id="oss-bucket-dynamic" style="
-                                padding: 12px 15px;
-                                border: 2px solid #e9ecef;
-                                border-radius: 8px;
-                                font-size: 1rem;
-                                width: 100%;
-                                box-sizing: border-box;
-                            " placeholder="OSS Bucket名称">
-                        </div>
-                        <div>
-                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">地域</label>
-                            <input type="text" id="oss-region-dynamic" style="
-                                padding: 12px 15px;
-                                border: 2px solid #e9ecef;
-                                border-radius: 8px;
-                                font-size: 1rem;
-                                width: 100%;
-                                box-sizing: border-box;
-                            " placeholder="如：oss-cn-beijing">
+                                box-sizing: border-box;" placeholder="阿里云OSS Access Key Secret">
                         </div>
                     </div>
                 </div>
@@ -2187,43 +2144,34 @@ function showConfigModal() {
             </div>
         </div>
     `;
-    
     // 添加到页面
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
-    
     // 绑定事件监听器
     const closeBtn = modal.querySelector('#close-dynamic-modal');
     const clearBtn = modal.querySelector('#clear-config-dynamic');
     const saveBtn = modal.querySelector('#save-config-dynamic');
     const testBtn = modal.querySelector('#test-connection-dynamic');
-    
     if (closeBtn) {
         closeBtn.addEventListener('click', closeDynamicConfigModal);
     }
-    
     if (clearBtn) {
         clearBtn.addEventListener('click', clearAllConfigDynamic);
     }
-    
     if (saveBtn) {
         saveBtn.addEventListener('click', saveConfigDynamic);
     }
-    
     if (testBtn) {
         testBtn.addEventListener('click', testApiConnectionDynamic);
     }
-    
     // 加载当前配置
     loadConfigToDynamicForm();
-    
     // 点击背景关闭
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             closeDynamicConfigModal();
         }
     });
-    
     console.log('✅ 动态模态框已显示，事件已绑定');
 }
 
@@ -2246,7 +2194,6 @@ function loadConfigToDynamicForm() {
     const ossAccessKeySecretInput = document.getElementById('oss-access-key-secret-dynamic');
     const ossBucketInput = document.getElementById('oss-bucket-dynamic');
     const ossRegionInput = document.getElementById('oss-region-dynamic');
-    
     if (styleApiKeyInput) styleApiKeyInput.value = API_CONFIG.FASTGPT_STYLE.apiKey || '';
     if (styleWorkflowInput) styleWorkflowInput.value = API_CONFIG.FASTGPT_STYLE.workflowId || '';
     if (contentApiKeyInput) contentApiKeyInput.value = API_CONFIG.FASTGPT_CONTENT.apiKey || '';
@@ -2267,7 +2214,6 @@ function saveConfigDynamic() {
     const ossAccessKeySecret = document.getElementById('oss-access-key-secret-dynamic')?.value || '';
     const ossBucket = document.getElementById('oss-bucket-dynamic')?.value || '';
     const ossRegion = document.getElementById('oss-region-dynamic')?.value || '';
-    
     if (styleApiKey) API_CONFIG.FASTGPT_STYLE.apiKey = styleApiKey;
     if (styleWorkflowId) API_CONFIG.FASTGPT_STYLE.workflowId = styleWorkflowId;
     if (contentApiKey) API_CONFIG.FASTGPT_CONTENT.apiKey = contentApiKey;
@@ -2276,7 +2222,6 @@ function saveConfigDynamic() {
     if (ossAccessKeySecret) API_CONFIG.OSS.accessKeySecret = ossAccessKeySecret;
     if (ossBucket) API_CONFIG.OSS.bucket = ossBucket;
     if (ossRegion) API_CONFIG.OSS.region = ossRegion;
-    
     localStorage.setItem('boss_kb_config', JSON.stringify(API_CONFIG));
     showToast('配置保存成功', 'success');
     closeDynamicConfigModal();
