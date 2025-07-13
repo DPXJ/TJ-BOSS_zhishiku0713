@@ -794,6 +794,13 @@ function loadConfigFromStorage() {
     if (savedConfig) {
         try {
             const parsedConfig = JSON.parse(savedConfig);
+            // 修复：如果FASTGPT_STYLE/FASTGPT_CONTENT为字符串，自动parse
+            if (typeof parsedConfig.FASTGPT_STYLE === 'string') {
+                parsedConfig.FASTGPT_STYLE = JSON.parse(parsedConfig.FASTGPT_STYLE);
+            }
+            if (typeof parsedConfig.FASTGPT_CONTENT === 'string') {
+                parsedConfig.FASTGPT_CONTENT = JSON.parse(parsedConfig.FASTGPT_CONTENT);
+            }
             API_CONFIG = { ...API_CONFIG, ...parsedConfig };
             console.log('✅ 配置已从本地存储加载');
         } catch (error) {
@@ -1117,6 +1124,13 @@ function saveConfigDynamic() {
     const contentApiKey = document.getElementById('content-api-key-dynamic')?.value || '';
     const ossAccessKeyId = document.getElementById('oss-access-key-id-dynamic')?.value || '';
     const ossAccessKeySecret = document.getElementById('oss-access-key-secret-dynamic')?.value || '';
+    // 修复：保存前确保为对象
+    if (typeof API_CONFIG.FASTGPT_STYLE === 'string') {
+        API_CONFIG.FASTGPT_STYLE = JSON.parse(API_CONFIG.FASTGPT_STYLE);
+    }
+    if (typeof API_CONFIG.FASTGPT_CONTENT === 'string') {
+        API_CONFIG.FASTGPT_CONTENT = JSON.parse(API_CONFIG.FASTGPT_CONTENT);
+    }
     if (styleApiKey) API_CONFIG.FASTGPT_STYLE.apiKey = styleApiKey;
     if (contentApiKey) API_CONFIG.FASTGPT_CONTENT.apiKey = contentApiKey;
     if (ossAccessKeyId) API_CONFIG.OSS.accessKeyId = ossAccessKeyId;
