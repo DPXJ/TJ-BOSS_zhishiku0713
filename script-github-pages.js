@@ -511,10 +511,7 @@ async function performStyleAnalysis() {
     }
     appState.isAnalyzing = true;
     updateAnalysisStatus('正在分析风格...');
-    
-    // 显示详细的进度提示
     showToast('正在调用FastGPT API进行风格分析，请稍候...', 'info');
-    
     // 动态插入红色提示
     const aiTipId = 'ai-learning-tip-dynamic';
     let aiTip = document.getElementById(aiTipId);
@@ -537,33 +534,24 @@ async function performStyleAnalysis() {
     try {
         let styleOutput;
         let debugRaw = {};
-        if (API_CONFIG.MODE === 'chat') {
-            if (!API_CONFIG.FASTGPT_STYLE.apiKey) {
-                throw new Error('对话模式需要配置风格分析API密钥');
-            }
-            // chat模式返回的就是style_output
-            const chatResponse = await analyzeStyleWithChatRaw(article_input, url_input);
-            styleOutput = chatResponse.style_output || chatResponse.content;
-            debugRaw = chatResponse.raw || { style_output: styleOutput };
+        // 关键优化：只要有文件就强制走workflow
+        if (article_input.length > 0) {
+            const result = await callStyleAnalysisWorkflowRaw(article_input, url_input);
+            styleOutput = result.style_output;
+            debugRaw = result;
         } else if (API_CONFIG.MODE === 'workflow') {
-            if (!API_CONFIG.FASTGPT_STYLE.workflowId || !API_CONFIG.FASTGPT_STYLE.apiKey) {
-                throw new Error('工作流模式需要配置API密钥和工作流ID');
-            }
-            // workflow模式返回完整响应
             const result = await callStyleAnalysisWorkflowRaw(article_input, url_input);
             styleOutput = result.style_output;
             debugRaw = result;
         } else {
-            throw new Error('请设置正确的接口模式（chat 或 workflow）');
+            const chatResponse = await analyzeStyleWithChatRaw(article_input, url_input);
+            styleOutput = chatResponse.style_output || chatResponse.content;
+            debugRaw = chatResponse.raw || { style_output: styleOutput };
         }
         appState.styleOutput = styleOutput;
         updateAnalysisStatus();
         showToast('风格分析完成', 'success');
-        
-        // 显示风格分析结果
         showStyleAnalysis(styleOutput);
-        
-        // 展示调试区内容
         showFastGPTDebug(debugRaw);
     } catch (error) {
         console.error('风格分析失败:', error);
