@@ -916,74 +916,243 @@ function showEnvironmentInfo() {
     }, 5000);
 }
 
-// 页面加载完成后的初始化
-document.addEventListener('DOMContentLoaded', async function() {
-    // 从本地存储加载配置
-    loadConfigFromStorage();
-    
-    // 设置默认风格，确保系统始终可用
-    appState.styleOutput = '正式严谨，条理清晰，用词准确，逻辑性强，表达规范';
-    
-    // 检查API连接状态
-    await checkAPIConnection();
-    
-    // 检查配置并初始化
-    checkAPIConfig();
-    
-    // 初始化OSS客户端（如果配置了）
-    if (API_CONFIG.OSS.accessKeyId && API_CONFIG.OSS.accessKeySecret) {
-        try {
-            await initializeOSS();
-        } catch (error) {
-            console.error('OSS初始化失败:', error);
-        }
+// 配置模态框相关函数
+function showConfigModal() {
+    console.log('📋 显示配置界面');
+    // 先移除可能存在的旧模态框
+    const existingModal = document.getElementById('config-modal-dynamic');
+    if (existingModal) {
+        existingModal.remove();
     }
-    
-    // 设置拖拽上传
-    setupDragDrop();
-    
-    // 初始化分析状态
-    updateAnalysisStatus('系统已就绪！可直接生成内容，或配置API使用高级功能');
-    
-    // 初始化AI学习按钮状态
-    checkLearningButtonStatus();
-    
-    // 添加快捷键支持
-    document.addEventListener('keydown', function(e) {
-        // Ctrl+Enter 快速生成
-        if (e.ctrlKey && e.key === 'Enter') {
-            e.preventDefault();
-            generateContent();
-        }
-        
-        // Ctrl+S 保存文档
-        if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            if (appState.generatedContent) {
-                saveResult();
-            }
-        }
+    // 创建模态框
+    const modal = document.createElement('div');
+    modal.id = 'config-modal-dynamic';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    // 创建模态框内容（隐藏ID、Bucket、地域输入框）
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+        ">
+            <div style="
+                padding: 20px;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            ">
+                <h3 style="margin: 0; font-size: 1.5rem; color: #333;">API配置</h3>
+                <button id="close-dynamic-modal" style="
+                    background: none;
+                    border: none;
+                    color: #666;
+                    font-size: 20px;
+                    cursor: pointer;
+                    padding: 5px;
+                    border-radius: 50%;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='none'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div style="padding: 20px;">
+                <div style="margin-bottom: 30px;">
+                    <h4 style="color: #333; margin-bottom: 20px; font-size: 1.1rem; border-bottom: 2px solid #f1f3f4; padding-bottom: 10px;">
+                        ⚙️ FastGPT配置
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div>
+                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">风格分析API密钥</label>
+                            <input type="password" id="style-api-key-dynamic" style="
+                                padding: 12px 15px;
+                                border: 2px solid #e9ecef;
+                                border-radius: 8px;
+                                font-size: 1rem;
+                                width: 100%;
+                                box-sizing: border-box;" placeholder="风格分析API密钥">
+                        </div>
+                        <div>
+                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">内容生成API密钥</label>
+                            <input type="password" id="content-api-key-dynamic" style="
+                                padding: 12px 15px;
+                                border: 2px solid #e9ecef;
+                                border-radius: 8px;
+                                font-size: 1rem;
+                                width: 100%;
+                                box-sizing: border-box;" placeholder="内容生成API密钥">
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 30px;">
+                    <h4 style="color: #333; margin-bottom: 20px; font-size: 1.1rem; border-bottom: 2px solid #f1f3f4; padding-bottom: 10px;">
+                        ☁️ 阿里云OSS配置
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div>
+                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">Access Key ID</label>
+                            <input type="text" id="oss-access-key-id-dynamic" style="
+                                padding: 12px 15px;
+                                border: 2px solid #e9ecef;
+                                border-radius: 8px;
+                                font-size: 1rem;
+                                width: 100%;
+                                box-sizing: border-box;" placeholder="阿里云OSS Access Key ID">
+                        </div>
+                        <div>
+                            <label style="font-weight: 600; margin-bottom: 8px; color: #333; display: block;">Access Key Secret</label>
+                            <input type="password" id="oss-access-key-secret-dynamic" style="
+                                padding: 12px 15px;
+                                border: 2px solid #e9ecef;
+                                border-radius: 8px;
+                                font-size: 1rem;
+                                width: 100%;
+                                box-sizing: border-box;" placeholder="阿里云OSS Access Key Secret">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="
+                background: #f8f9fa;
+                padding: 20px;
+                display: flex;
+                gap: 15px;
+                justify-content: flex-end;
+                border-top: 1px solid #eee;
+            ">
+                <button id="clear-config-dynamic" style="
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    cursor: pointer;
+                    background: #6c757d;
+                    color: white;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.background='#5a6268'" onmouseout="this.style.background='#6c757d'">清除所有配置</button>
+                <button id="save-config-dynamic" style="
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    cursor: pointer;
+                    background: #667eea;
+                    color: white;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.background='#5a6fd8'" onmouseout="this.style.background='#667eea'">保存配置</button>
+                <button id="test-connection-dynamic" style="
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    cursor: pointer;
+                    background: #28a745;
+                    color: white;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.background='#218838'" onmouseout="this.style.background='#28a745'">测试连接</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    // 绑定事件监听器
+    const closeBtn = modal.querySelector('#close-dynamic-modal');
+    const clearBtn = modal.querySelector('#clear-config-dynamic');
+    const saveBtn = modal.querySelector('#save-config-dynamic');
+    const testBtn = modal.querySelector('#test-connection-dynamic');
+    if (closeBtn) closeBtn.addEventListener('click', closeDynamicConfigModal);
+    if (clearBtn) clearBtn.addEventListener('click', clearAllConfigDynamic);
+    if (saveBtn) saveBtn.addEventListener('click', saveConfigDynamic);
+    if (testBtn) testBtn.addEventListener('click', testApiConnectionDynamic);
+    // 加载当前配置
+    loadConfigToDynamicForm();
+    // 点击背景关闭
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeDynamicConfigModal();
     });
-    
-    // 实时保存表单数据到本地存储
-    const inputs = document.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        input.addEventListener('change', function() {
-            localStorage.setItem(`boss-kb-${input.id}`, input.value);
-        });
-        
-        // 加载保存的数据
-        const saved = localStorage.getItem(`boss-kb-${input.id}`);
-        if (saved && input.id !== 'file-input') {
-            input.value = saved;
+    console.log('✅ 动态模态框已显示，事件已绑定');
+}
+function closeDynamicConfigModal() {
+    const modal = document.getElementById('config-modal-dynamic');
+    if (modal) {
+        modal.remove();
+        document.body.style.overflow = 'auto';
+    }
+}
+function loadConfigToDynamicForm() {
+    const styleApiKeyInput = document.getElementById('style-api-key-dynamic');
+    const contentApiKeyInput = document.getElementById('content-api-key-dynamic');
+    const ossAccessKeyIdInput = document.getElementById('oss-access-key-id-dynamic');
+    const ossAccessKeySecretInput = document.getElementById('oss-access-key-secret-dynamic');
+    if (styleApiKeyInput) styleApiKeyInput.value = API_CONFIG.FASTGPT_STYLE.apiKey || '';
+    if (contentApiKeyInput) contentApiKeyInput.value = API_CONFIG.FASTGPT_CONTENT.apiKey || '';
+    if (ossAccessKeyIdInput) ossAccessKeyIdInput.value = API_CONFIG.OSS.accessKeyId || '';
+    if (ossAccessKeySecretInput) ossAccessKeySecretInput.value = API_CONFIG.OSS.accessKeySecret || '';
+}
+function saveConfigDynamic() {
+    const styleApiKey = document.getElementById('style-api-key-dynamic')?.value || '';
+    const contentApiKey = document.getElementById('content-api-key-dynamic')?.value || '';
+    const ossAccessKeyId = document.getElementById('oss-access-key-id-dynamic')?.value || '';
+    const ossAccessKeySecret = document.getElementById('oss-access-key-secret-dynamic')?.value || '';
+    if (styleApiKey) API_CONFIG.FASTGPT_STYLE.apiKey = styleApiKey;
+    if (contentApiKey) API_CONFIG.FASTGPT_CONTENT.apiKey = contentApiKey;
+    if (ossAccessKeyId) API_CONFIG.OSS.accessKeyId = ossAccessKeyId;
+    if (ossAccessKeySecret) API_CONFIG.OSS.accessKeySecret = ossAccessKeySecret;
+    localStorage.setItem('boss_kb_config', JSON.stringify(API_CONFIG));
+    showToast('配置保存成功', 'success');
+    closeDynamicConfigModal();
+    if (API_CONFIG.OSS.accessKeyId && API_CONFIG.OSS.accessKeySecret) {
+        initializeOSS();
+    }
+}
+function clearAllConfigDynamic() {
+    if (confirm('确定要清除所有API配置吗？此操作将清除所有密钥和配置信息。')) {
+        localStorage.removeItem('boss_kb_config');
+        API_CONFIG.FASTGPT_STYLE.apiKey = '';
+        API_CONFIG.FASTGPT_CONTENT.apiKey = '';
+        API_CONFIG.OSS.accessKeyId = '';
+        API_CONFIG.OSS.accessKeySecret = '';
+        showToast('API配置已清除，请重新配置', 'info');
+        closeDynamicConfigModal();
+    }
+}
+async function testApiConnectionDynamic() {
+    showToast('正在测试API连接...', 'info');
+    try {
+        const response = await fetch(`${API_BASE}/api/fastgpt/health`);
+        if (response.ok) {
+            showToast('API连接正常', 'success');
+        } else {
+            showToast('API连接异常', 'error');
         }
-    });
-    
-    // 显示环境信息
-    showEnvironmentInfo();
-});
-
-// 全局函数挂载
+    } catch (error) {
+        showToast('API连接失败', 'error');
+    }
+}
+// 全局挂载
 window.selectFiles = selectFiles;
 window.addUrlInput = addUrlInput;
 window.performStyleAnalysis = performStyleAnalysis;
@@ -992,3 +1161,8 @@ window.removeFile = removeFile;
 window.saveUrl = saveUrl;
 window.removeUrl = removeUrl;
 window.generateContent = generateContent; 
+window.showConfigModal = showConfigModal;
+window.closeDynamicConfigModal = closeDynamicConfigModal;
+window.saveConfigDynamic = saveConfigDynamic;
+window.clearAllConfigDynamic = clearAllConfigDynamic;
+window.testApiConnectionDynamic = testApiConnectionDynamic; 
