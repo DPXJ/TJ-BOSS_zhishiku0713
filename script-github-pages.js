@@ -27,13 +27,13 @@ let API_CONFIG = {
     // FastGPT配置 - 风格分析
     FASTGPT_STYLE: {
         baseUrl: 'https://api.fastgpt.in/api', // FastGPT官方API地址
-        apiKey: 'fastgpt-uWWVnoPpJIc57h6BiLumhzeyk89gfyPmQCCYn8R214C71i6tL6Pa5Gsov7NnIYH', // 直接写入风格分析密钥
+        apiKey: 'fastgpt-uWWVnoPpJIc57h6BiLumhzeyk89gfyPmQCCYn8R214C71i6tL6Pa5Gsov7NnIYH', // 写死的风格分析密钥
         workflowId: '685f87df49b71f158b57ae61' // 风格分析工作流ID（已修正）
     },
     // FastGPT配置 - 内容生成
     FASTGPT_CONTENT: {
         baseUrl: 'https://api.fastgpt.in/api', // FastGPT官方API地址
-        apiKey: 'fastgpt-p2WSK5LRZZM3tVzk0XRT4vERkQ2PYLXi6rFAZdHzzuB7mSicDLRBXiymej', // 直接写入内容生成密钥
+        apiKey: 'fastgpt-p2WSK5LRZZM3tVzk0XRT4vERkQ2PYLXi6rFAZdHzzuB7mSicDLRBXiymej', // 写死的内容生成密钥
         workflowId: '685c9d7e6adb97a0858caaa6' // 内容创作工作流ID（已修正）
     },
     // 接口模式选择：'workflow' 或 'chat'
@@ -801,17 +801,29 @@ function loadConfigFromStorage() {
             if (typeof parsedConfig.FASTGPT_CONTENT === 'string') {
                 parsedConfig.FASTGPT_CONTENT = JSON.parse(parsedConfig.FASTGPT_CONTENT);
             }
+            
+            // 保存写死的API密钥，不被localStorage覆盖
+            const hardcodedStyleKey = API_CONFIG.FASTGPT_STYLE.apiKey;
+            const hardcodedContentKey = API_CONFIG.FASTGPT_CONTENT.apiKey;
+            
             API_CONFIG = { ...API_CONFIG, ...parsedConfig };
+            
+            // 强制恢复写死的API密钥
+            API_CONFIG.FASTGPT_STYLE.apiKey = hardcodedStyleKey;
+            API_CONFIG.FASTGPT_CONTENT.apiKey = hardcodedContentKey;
+            
             // 再次强制修正
             console.log('[DEBUG] 合并后 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);
             if (typeof API_CONFIG.FASTGPT_STYLE === 'string') {
                 API_CONFIG.FASTGPT_STYLE = JSON.parse(API_CONFIG.FASTGPT_STYLE);
+                API_CONFIG.FASTGPT_STYLE.apiKey = hardcodedStyleKey; // 恢复写死的密钥
             }
             if (typeof API_CONFIG.FASTGPT_CONTENT === 'string') {
                 API_CONFIG.FASTGPT_CONTENT = JSON.parse(API_CONFIG.FASTGPT_CONTENT);
+                API_CONFIG.FASTGPT_CONTENT.apiKey = hardcodedContentKey; // 恢复写死的密钥
             }
             console.log('[DEBUG] 修正后 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);
-            console.log('✅ 配置已从本地存储加载');
+            console.log('✅ 配置已从本地存储加载（API密钥保持写死状态）');
         } catch (error) {
             console.error('❌ 配置加载失败:', error);
         }
@@ -1119,20 +1131,18 @@ function closeDynamicConfigModal() {
     }
 }
 function loadConfigToDynamicForm() {
-    const styleApiKeyInput = document.getElementById('style-api-key-dynamic');
-    const contentApiKeyInput = document.getElementById('content-api-key-dynamic');
+    // API密钥已写死在代码中，无需从表单加载
     const ossAccessKeyIdInput = document.getElementById('oss-access-key-id-dynamic');
     const ossAccessKeySecretInput = document.getElementById('oss-access-key-secret-dynamic');
-    if (styleApiKeyInput) styleApiKeyInput.value = API_CONFIG.FASTGPT_STYLE.apiKey || '';
-    if (contentApiKeyInput) contentApiKeyInput.value = API_CONFIG.FASTGPT_CONTENT.apiKey || '';
     if (ossAccessKeyIdInput) ossAccessKeyIdInput.value = API_CONFIG.OSS.accessKeyId || '';
     if (ossAccessKeySecretInput) ossAccessKeySecretInput.value = API_CONFIG.OSS.accessKeySecret || '';
+    console.log('✅ API密钥已写死在代码中，仅加载OSS配置到表单');
 }
 function saveConfigDynamic() {
-    const styleApiKey = document.getElementById('style-api-key-dynamic')?.value || '';
-    const contentApiKey = document.getElementById('content-api-key-dynamic')?.value || '';
+    // API密钥已写死在代码中，无需从表单获取
     const ossAccessKeyId = document.getElementById('oss-access-key-id-dynamic')?.value || '';
     const ossAccessKeySecret = document.getElementById('oss-access-key-secret-dynamic')?.value || '';
+    
     // 强制修正结构
     try {
         console.log('[DEBUG] 保存前 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);
@@ -1143,11 +1153,20 @@ function saveConfigDynamic() {
             API_CONFIG.FASTGPT_CONTENT = JSON.parse(API_CONFIG.FASTGPT_CONTENT);
         }
     } catch(e) {
-        API_CONFIG.FASTGPT_STYLE = { baseUrl: 'https://api.fastgpt.in/api', apiKey: '', workflowId: '685f87df49b71f158b57ae61' };
-        API_CONFIG.FASTGPT_CONTENT = { baseUrl: 'https://api.fastgpt.in/api', apiKey: '', workflowId: '685c9d7e6adb97a0858caaa6' };
+        // API密钥保持写死状态
+        API_CONFIG.FASTGPT_STYLE = { 
+            baseUrl: 'https://api.fastgpt.in/api', 
+            apiKey: 'fastgpt-uWWVnoPpJIc57h6BiLumhzeyk89gfyPmQCCYn8R214C71i6tL6Pa5Gsov7NnIYH', 
+            workflowId: '685f87df49b71f158b57ae61' 
+        };
+        API_CONFIG.FASTGPT_CONTENT = { 
+            baseUrl: 'https://api.fastgpt.in/api', 
+            apiKey: 'fastgpt-p2WSK5LRZZM3tVzk0XRT4vERkQ2PYLXi6rFAZdHzzuB7mSicDLRBXiymej', 
+            workflowId: '685c9d7e6adb97a0858caaa6' 
+        };
     }
-    if (styleApiKey) API_CONFIG.FASTGPT_STYLE.apiKey = styleApiKey;
-    if (contentApiKey) API_CONFIG.FASTGPT_CONTENT.apiKey = contentApiKey;
+    
+    // 只保存OSS配置，API密钥保持写死状态
     if (ossAccessKeyId) API_CONFIG.OSS.accessKeyId = ossAccessKeyId;
     if (ossAccessKeySecret) API_CONFIG.OSS.accessKeySecret = ossAccessKeySecret;
     console.log('[DEBUG] 保存后 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);

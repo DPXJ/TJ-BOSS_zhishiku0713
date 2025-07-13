@@ -11,13 +11,13 @@ let API_CONFIG = {
     // FastGPT配置 - 风格分析
     FASTGPT_STYLE: {
         baseUrl: 'https://api.fastgpt.in/api', // FastGPT官方API地址
-        apiKey: 'fastgpt-oCBXIfsNzyuNuzlq3LDXoe8v73SFg4g2MbVKV8GXMMxMpYBRlLyw6', // 风格分析专用密钥
+        apiKey: 'fastgpt-uWWVnoPpJIc57h6BiLumhzeyk89gfyPmQCCYn8R214C71i6tL6Pa5Gsov7NnIYH', // 写死的风格分析密钥
         workflowId: '685f87df49b71f158b57ae61' // 风格分析工作流ID（已修正）
     },
     // FastGPT配置 - 内容生成
     FASTGPT_CONTENT: {
         baseUrl: 'https://api.fastgpt.in/api', // FastGPT官方API地址
-        apiKey: 'fastgpt-p2WSK5LRZZM3tVzk0XRT4vERkQ2PYLXi6rFAZdHzzuB7mSicDLRBXiymej', // 内容生成专用密钥
+        apiKey: 'fastgpt-p2WSK5LRZZM3tVzk0XRT4vERkQ2PYLXi6rFAZdHzzuB7mSicDLRBXiymej', // 写死的内容生成密钥
         workflowId: '685c9d7e6adb97a0858caaa6' // 内容创作工作流ID（已修正）
     },
     // 接口模式选择：'workflow' 或 'chat'
