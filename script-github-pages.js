@@ -794,6 +794,7 @@ function loadConfigFromStorage() {
     if (savedConfig) {
         try {
             const parsedConfig = JSON.parse(savedConfig);
+            console.log('[DEBUG] 加载前 parsedConfig.FASTGPT_STYLE:', typeof parsedConfig.FASTGPT_STYLE, parsedConfig.FASTGPT_STYLE);
             if (typeof parsedConfig.FASTGPT_STYLE === 'string') {
                 parsedConfig.FASTGPT_STYLE = JSON.parse(parsedConfig.FASTGPT_STYLE);
             }
@@ -802,12 +803,14 @@ function loadConfigFromStorage() {
             }
             API_CONFIG = { ...API_CONFIG, ...parsedConfig };
             // 再次强制修正
+            console.log('[DEBUG] 合并后 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);
             if (typeof API_CONFIG.FASTGPT_STYLE === 'string') {
                 API_CONFIG.FASTGPT_STYLE = JSON.parse(API_CONFIG.FASTGPT_STYLE);
             }
             if (typeof API_CONFIG.FASTGPT_CONTENT === 'string') {
                 API_CONFIG.FASTGPT_CONTENT = JSON.parse(API_CONFIG.FASTGPT_CONTENT);
             }
+            console.log('[DEBUG] 修正后 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);
             console.log('✅ 配置已从本地存储加载');
         } catch (error) {
             console.error('❌ 配置加载失败:', error);
@@ -1132,6 +1135,7 @@ function saveConfigDynamic() {
     const ossAccessKeySecret = document.getElementById('oss-access-key-secret-dynamic')?.value || '';
     // 强制修正结构
     try {
+        console.log('[DEBUG] 保存前 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);
         if (typeof API_CONFIG.FASTGPT_STYLE === 'string') {
             API_CONFIG.FASTGPT_STYLE = JSON.parse(API_CONFIG.FASTGPT_STYLE);
         }
@@ -1146,9 +1150,11 @@ function saveConfigDynamic() {
     if (contentApiKey) API_CONFIG.FASTGPT_CONTENT.apiKey = contentApiKey;
     if (ossAccessKeyId) API_CONFIG.OSS.accessKeyId = ossAccessKeyId;
     if (ossAccessKeySecret) API_CONFIG.OSS.accessKeySecret = ossAccessKeySecret;
+    console.log('[DEBUG] 保存后 API_CONFIG.FASTGPT_STYLE:', typeof API_CONFIG.FASTGPT_STYLE, API_CONFIG.FASTGPT_STYLE);
     localStorage.setItem('boss_kb_config', JSON.stringify(API_CONFIG));
     // 保存后立即reload，彻底修正结构
     loadConfigFromStorage();
+    console.log('[DEBUG] 保存后 localStorage:', localStorage.getItem('boss_kb_config'));
     showToast('配置保存成功', 'success');
     closeDynamicConfigModal();
     if (API_CONFIG.OSS.accessKeyId && API_CONFIG.OSS.accessKeySecret) {
