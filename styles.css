@@ -1386,3 +1386,19 @@ body {
     color: #3b4cca;
     box-shadow: 0 2px 8px rgba(102,126,234,0.12);
 } 
+
+.copy-test-url-link {
+    color: #27ae60 !important;
+    text-decoration: none;
+    font-size: 10px;
+    position: absolute;
+    right: 10px;
+    top: 60px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.copy-test-url-link:hover {
+    color: #337ab7 !important;
+    text-decoration: underline !important;
+} 

@@ -515,6 +515,24 @@ async function performStyleAnalysis() {
     // 显示详细的进度提示
     showToast('正在调用FastGPT API进行风格分析，请稍候...', 'info');
     
+    // 动态插入红色提示
+    const aiTipId = 'ai-learning-tip-dynamic';
+    let aiTip = document.getElementById(aiTipId);
+    if (!aiTip) {
+        aiTip = document.createElement('div');
+        aiTip.id = aiTipId;
+        aiTip.style.color = '#e74c3c';
+        aiTip.style.marginTop = '18px';
+        aiTip.style.fontSize = '0.88rem';
+        aiTip.style.textAlign = 'center';
+        aiTip.style.fontWeight = '500';
+        aiTip.textContent = 'AI学习中...  大约3-5分钟，请耐心等待。学习完成之后，风格学习结果会在下方的「内容风格」回显，请注意查看。';
+        const btn = document.getElementById('start-learning-btn');
+        if (btn && btn.parentNode) {
+            btn.parentNode.appendChild(aiTip);
+        }
+    }
+
     checkLearningButtonStatus();
     try {
         let styleOutput;
@@ -554,6 +572,11 @@ async function performStyleAnalysis() {
     } finally {
         appState.isAnalyzing = false;
         checkLearningButtonStatus();
+        // 移除动态提示
+        const aiTip = document.getElementById('ai-learning-tip-dynamic');
+        if (aiTip && aiTip.parentNode) {
+            aiTip.parentNode.removeChild(aiTip);
+        }
     }
 }
 
@@ -1500,4 +1523,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     showEnvironmentInfo();
     
     console.log('✅ 页面初始化完成');
+    
+    // 示例链接复制功能
+    const copyTestUrlLink = document.getElementById('copy-test-url-link');
+    if (copyTestUrlLink) {
+        copyTestUrlLink.addEventListener('click', function() {
+            const text = 'https://www.woshipm.com/it/6234959.html';
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('已复制到剪贴板', 'success');
+            });
+        });
+    }
 }); 
