@@ -722,6 +722,52 @@ async function callChatCompletions(messages, chatId, variables, apiKey, workflow
     return styleOutput;
 }
 
+// 内容生成专用的对话接口调用函数
+async function callContentGenerationChatCompletions(messages, chatId, variables, apiKey, workflowId) {
+    const requestBody = {
+        chatId: chatId || Date.now().toString(),
+        stream: false,
+        detail: true,
+        workflowId: workflowId,
+        messages: messages,
+        variables: variables || {}
+    };
+    
+    // 直接调用FastGPT API
+    const response = await fetch(`https://api.fastgpt.in/api/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify(requestBody)
+    });
+    
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`内容生成接口调用失败: ${response.status} - ${errorText}`);
+    }
+    
+    const result = await response.json();
+    console.log('✅ 内容生成接口响应:', result);
+    
+    // 优先获取AIcontent_output变量
+    if (result.newVariables?.AIcontent_output) {
+        console.log('📝 从newVariables.AIcontent_output获取内容生成结果:', result.newVariables.AIcontent_output);
+        return result.newVariables.AIcontent_output;
+    }
+    
+    // 备选：从标准chat completion格式获取
+    if (result.choices?.[0]?.message?.content) {
+        console.log('📝 从choices[0].message.content获取内容生成结果:', result.choices[0].message.content);
+        return result.choices[0].message.content;
+    }
+    
+    // 调试：输出完整响应结构
+    console.error('❌ 无法从响应中提取内容生成结果，完整响应:', JSON.stringify(result, null, 2));
+    throw new Error('无法从工作流获取内容生成结果，请检查工作流配置');
+}
+
 // 内容生成功能
 async function generateContent() {
     // 安全获取DOM元素值，防止null错误
@@ -814,7 +860,7 @@ async function generateContentWithChat(styleOutput, contentLength, topic, styleT
         { role: 'user', content: `请根据以下要求生成内容：\n\n主题：${topic}\n风格：${styleOutput}\n内容类型：${styleType}\n字数要求：${contentLength}字\n补充说明：${remark || '无'}` }
     ];
     
-    return await callChatCompletions(messages, null, null, API_CONFIG.FASTGPT_CONTENT.apiKey, API_CONFIG.FASTGPT_CONTENT.workflowId);
+    return await callContentGenerationChatCompletions(messages, null, null, API_CONFIG.FASTGPT_CONTENT.apiKey, API_CONFIG.FASTGPT_CONTENT.workflowId);
 }
 
 // 显示生成的内容
