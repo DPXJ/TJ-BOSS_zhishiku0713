@@ -505,6 +505,10 @@ async function performStyleAnalysis() {
     }
     appState.isAnalyzing = true;
     updateAnalysisStatus('正在分析风格...');
+    
+    // 显示详细的进度提示
+    showToast('正在调用FastGPT API进行风格分析，请稍候...', 'info');
+    
     checkLearningButtonStatus();
     try {
         let styleOutput;
@@ -531,6 +535,10 @@ async function performStyleAnalysis() {
         appState.styleOutput = styleOutput;
         updateAnalysisStatus();
         showToast('风格分析完成', 'success');
+        
+        // 显示风格分析结果
+        showStyleAnalysis(styleOutput);
+        
         // 展示调试区内容
         showFastGPTDebug(debugRaw);
     } catch (error) {
@@ -792,6 +800,72 @@ function showFastGPTDebug(debugData) {
         `;
         debugContainer.style.display = 'block';
     }
+}
+
+// 显示风格分析结果
+function showStyleAnalysis(content) {
+    const styleOutput = document.getElementById('style-output');
+    if (!styleOutput) {
+        console.error('未找到style-output元素');
+        return;
+    }
+    
+    // 创建容器
+    const container = document.createElement('div');
+    container.className = 'style-analysis-container';
+    
+    // 顶部标题和按钮组
+    const header = document.createElement('div');
+    header.className = 'style-analysis-header';
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    
+    // 标题
+    const title = document.createElement('div');
+    title.style.fontWeight = 'bold';
+    title.style.fontSize = '1.15rem';
+    title.textContent = '内容风格';
+    
+    // 按钮组
+    const actionsDiv = document.createElement('div');
+    actionsDiv.style.display = 'flex';
+    actionsDiv.style.gap = '10px';
+    actionsDiv.style.alignItems = 'center';
+    
+    // 复制按钮
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'action-btn';
+    copyBtn.innerHTML = '<i class="fas fa-copy"></i> 复制';
+    copyBtn.onclick = function() {
+        navigator.clipboard.writeText(content).then(() => {
+            showToast('已复制到剪贴板', 'success');
+        });
+    };
+    actionsDiv.appendChild(copyBtn);
+    
+    // 组装header
+    header.appendChild(title);
+    header.appendChild(actionsDiv);
+    
+    // 内容区
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'style-analysis-content';
+    contentDiv.style.position = 'relative';
+    
+    let renderedContent = marked.parse(content);
+    contentDiv.innerHTML = `<div class="markdown-content" id="style-markdown-content">${renderedContent}</div>`;
+    
+    // 组装
+    container.appendChild(header);
+    container.appendChild(contentDiv);
+    styleOutput.innerHTML = '';
+    styleOutput.appendChild(container);
+    
+    // 代码高亮
+    document.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightBlock(block);
+    });
 }
 
 // 配置相关函数
