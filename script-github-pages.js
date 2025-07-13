@@ -160,3 +160,4 @@ window.GitHubPagesFastGPT = {
     isLocalEnvironment,
     API_BASE
 }; 
+window.addUrlInput = addUrlInput; 
