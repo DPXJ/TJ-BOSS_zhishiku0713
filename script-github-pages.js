@@ -718,10 +718,21 @@ async function callChatCompletions(messages, chatId, variables, apiKey, workflow
 
 // 内容生成功能
 async function generateContent() {
-    const contentLength = parseInt(document.getElementById('word-count').value) || 500;
-    const topic = document.getElementById('topic').value.trim();
+    // 安全获取DOM元素值，防止null错误
+    const wordCountEl = document.getElementById('word-count');
+    const topicEl = document.getElementById('topic');
+    const notesEl = document.getElementById('notes');
+    
+    if (!wordCountEl || !topicEl || !notesEl) {
+        console.error('❌ DOM元素未找到:', { wordCountEl, topicEl, notesEl });
+        showToast('页面元素加载异常，请刷新页面重试', 'error');
+        return;
+    }
+    
+    const contentLength = parseInt(wordCountEl.value) || 500;
+    const topic = topicEl.value ? topicEl.value.trim() : '';
     const styleType = '文章'; // 默认类型，因为HTML中没有style-type选择器
-    const remark = document.getElementById('notes').value.trim();
+    const remark = notesEl.value ? notesEl.value.trim() : '';
     
     console.log('🔄 开始内容生成:', { contentLength, topic, styleType, remark });
     console.log('📊 当前风格分析结果:', appState.styleOutput);
@@ -1303,3 +1314,41 @@ window.closeDynamicConfigModal = closeDynamicConfigModal;
 window.saveConfigDynamic = saveConfigDynamic;
 window.clearAllConfigDynamic = clearAllConfigDynamic;
 window.testApiConnectionDynamic = testApiConnectionDynamic; 
+
+// 页面加载完成后的初始化
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 页面初始化开始...');
+    
+    // 从本地存储加载配置
+    loadConfigFromStorage();
+    
+    // 设置默认风格，确保系统始终可用
+    appState.styleOutput = '正式严谨，条理清晰，用词准确，逻辑性强，表达规范';
+    
+    // 检查API连接状态
+    await checkAPIConnection();
+    
+    // 检查配置并初始化
+    checkAPIConfig();
+    
+    // 初始化OSS客户端（如果配置了）
+    if (API_CONFIG.OSS.accessKeyId && API_CONFIG.OSS.accessKeySecret) {
+        try {
+            await initializeOSS();
+            console.log('✅ OSS客户端初始化成功');
+        } catch (error) {
+            console.error('❌ OSS初始化失败:', error);
+        }
+    }
+    
+    // 设置拖拽功能
+    setupDragDrop();
+    
+    // 检查按钮状态
+    checkLearningButtonStatus();
+    
+    // 显示环境信息
+    showEnvironmentInfo();
+    
+    console.log('✅ 页面初始化完成');
+}); 
