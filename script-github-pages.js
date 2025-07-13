@@ -9,7 +9,8 @@ const isLocalEnvironment = window.location.hostname === 'localhost' ||
                           window.location.hostname === '127.0.0.1';
 
 // 根据环境选择API基础地址
-const API_BASE = isLocalEnvironment ? '' : VERCEL_API_BASE;
+// 临时方案：直接调用FastGPT API，绕过Vercel代理
+const API_BASE = isLocalEnvironment ? '' : '';
 
 console.log('🌐 当前环境:', isLocalEnvironment ? '本地' : 'GitHub Pages/Actions');
 console.log('🌐 API_BASE:', API_BASE);
@@ -605,7 +606,8 @@ async function callChatCompletionsRaw(messages, chatId, variables, apiKey, workf
         variables: variables || {}
     };
     
-    const response = await fetch(`${API_BASE}/api/fastgpt/v1/chat/completions`, {
+    // 直接调用FastGPT API
+    const response = await fetch(`https://api.fastgpt.in/api/v1/chat/completions`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -669,7 +671,8 @@ async function callChatCompletions(messages, chatId, variables, apiKey, workflow
         variables: variables || {}
     };
     
-    const response = await fetch(`${API_BASE}/api/fastgpt/v1/chat/completions`, {
+    // 直接调用FastGPT API
+    const response = await fetch(`https://api.fastgpt.in/api/v1/chat/completions`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
