@@ -220,7 +220,8 @@ async function callStyleAnalysisWorkflow(fileUrls, userUrls) {
         throw new Error('风格分析工作流ID未配置，请先配置workflowId');
     }
     
-    const response = await fetch(`${API_BASE}/api/fastgpt/workflow/run`, {
+    // 直接调用FastGPT API
+    const response = await fetch(`https://api.fastgpt.in/api/workflow/run`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -279,7 +280,8 @@ async function callContentGenerationWorkflow(styleOutput, contentLength, topic, 
         }
     };
     
-    const response = await fetch(`${API_BASE}/api/fastgpt/v1/chat/completions`, {
+    // 直接调用FastGPT API
+    const response = await fetch(`https://api.fastgpt.in/api/v1/chat/completions`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -545,7 +547,8 @@ async function performStyleAnalysis() {
 async function callStyleAnalysisWorkflowRaw(fileUrls, userUrls) {
     const safeFileUrls = Array.isArray(fileUrls) ? fileUrls : [];
     const safeUserUrls = Array.isArray(userUrls) ? userUrls : [];
-    const response = await fetch(`${API_BASE}/api/fastgpt/workflow/run`, {
+    // 直接调用FastGPT API
+    const response = await fetch(`https://api.fastgpt.in/api/workflow/run`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -863,7 +866,8 @@ function checkAPIConfig() {
 
 async function checkAPIConnection() {
     try {
-        const response = await fetch(`${API_BASE}/api/fastgpt/health`);
+        // 直接调用FastGPT API（健康检查）
+        const response = await fetch(`https://api.fastgpt.in/api/health`);
         if (response.ok) {
             console.log('✅ API连接正常');
         } else {
@@ -1197,7 +1201,8 @@ function clearAllConfigDynamic() {
 async function testApiConnectionDynamic() {
     showToast('正在测试API连接...', 'info');
     try {
-        const response = await fetch(`${API_BASE}/api/fastgpt/health`);
+        // 直接调用FastGPT API（健康检查）
+        const response = await fetch(`https://api.fastgpt.in/api/health`);
         if (response.ok) {
             showToast('API连接正常', 'success');
         } else {
