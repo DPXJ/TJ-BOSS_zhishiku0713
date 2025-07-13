@@ -2238,16 +2238,18 @@ function closeDynamicConfigModal() {
 
 // 加载配置到动态表单
 function loadConfigToDynamicForm() {
-    const apikeyInput = document.getElementById('fastgpt-apikey-dynamic');
+    const styleApiKeyInput = document.getElementById('style-api-key-dynamic');
     const styleWorkflowInput = document.getElementById('style-workflow-id-dynamic');
+    const contentApiKeyInput = document.getElementById('content-api-key-dynamic');
     const contentWorkflowInput = document.getElementById('content-workflow-id-dynamic');
     const ossAccessKeyIdInput = document.getElementById('oss-access-key-id-dynamic');
     const ossAccessKeySecretInput = document.getElementById('oss-access-key-secret-dynamic');
     const ossBucketInput = document.getElementById('oss-bucket-dynamic');
     const ossRegionInput = document.getElementById('oss-region-dynamic');
     
-    if (apikeyInput) apikeyInput.value = API_CONFIG.FASTGPT_CONTENT.apiKey || '';
+    if (styleApiKeyInput) styleApiKeyInput.value = API_CONFIG.FASTGPT_STYLE.apiKey || '';
     if (styleWorkflowInput) styleWorkflowInput.value = API_CONFIG.FASTGPT_STYLE.workflowId || '';
+    if (contentApiKeyInput) contentApiKeyInput.value = API_CONFIG.FASTGPT_CONTENT.apiKey || '';
     if (contentWorkflowInput) contentWorkflowInput.value = API_CONFIG.FASTGPT_CONTENT.workflowId || '';
     if (ossAccessKeyIdInput) ossAccessKeyIdInput.value = API_CONFIG.OSS.accessKeyId || '';
     if (ossAccessKeySecretInput) ossAccessKeySecretInput.value = API_CONFIG.OSS.accessKeySecret || '';
@@ -2257,33 +2259,27 @@ function loadConfigToDynamicForm() {
 
 // 保存动态配置
 function saveConfigDynamic() {
-    const apikey = document.getElementById('fastgpt-apikey-dynamic')?.value || '';
+    const styleApiKey = document.getElementById('style-api-key-dynamic')?.value || '';
     const styleWorkflowId = document.getElementById('style-workflow-id-dynamic')?.value || '';
+    const contentApiKey = document.getElementById('content-api-key-dynamic')?.value || '';
     const contentWorkflowId = document.getElementById('content-workflow-id-dynamic')?.value || '';
     const ossAccessKeyId = document.getElementById('oss-access-key-id-dynamic')?.value || '';
     const ossAccessKeySecret = document.getElementById('oss-access-key-secret-dynamic')?.value || '';
     const ossBucket = document.getElementById('oss-bucket-dynamic')?.value || '';
     const ossRegion = document.getElementById('oss-region-dynamic')?.value || '';
     
-    // 更新配置
-    if (apikey) {
-        API_CONFIG.FASTGPT_STYLE.apiKey = apikey;
-        API_CONFIG.FASTGPT_CONTENT.apiKey = apikey;
-    }
+    if (styleApiKey) API_CONFIG.FASTGPT_STYLE.apiKey = styleApiKey;
     if (styleWorkflowId) API_CONFIG.FASTGPT_STYLE.workflowId = styleWorkflowId;
+    if (contentApiKey) API_CONFIG.FASTGPT_CONTENT.apiKey = contentApiKey;
     if (contentWorkflowId) API_CONFIG.FASTGPT_CONTENT.workflowId = contentWorkflowId;
     if (ossAccessKeyId) API_CONFIG.OSS.accessKeyId = ossAccessKeyId;
     if (ossAccessKeySecret) API_CONFIG.OSS.accessKeySecret = ossAccessKeySecret;
     if (ossBucket) API_CONFIG.OSS.bucket = ossBucket;
     if (ossRegion) API_CONFIG.OSS.region = ossRegion;
     
-    // 保存到localStorage
     localStorage.setItem('boss_kb_config', JSON.stringify(API_CONFIG));
-    
     showToast('配置保存成功', 'success');
     closeDynamicConfigModal();
-    
-    // 如果配置了OSS，重新初始化
     if (API_CONFIG.OSS.accessKeyId && API_CONFIG.OSS.accessKeySecret) {
         initializeOSS();
     }
@@ -2336,23 +2332,20 @@ function closeConfigModal() {
 }
 
 function loadConfigToForm() {
-    // FastGPT配置
-    const apikeyInput = document.getElementById('fastgpt-apikey');
+    const styleApiKeyInput = document.getElementById('style-api-key');
     const styleWorkflowInput = document.getElementById('style-workflow-id');
+    const contentApiKeyInput = document.getElementById('content-api-key');
     const contentWorkflowInput = document.getElementById('content-workflow-id');
     const apiModeSelect = document.getElementById('api-mode');
-    
-    // OSS配置
     const ossAccessKeyIdInput = document.getElementById('oss-access-key-id');
     const ossAccessKeySecretInput = document.getElementById('oss-access-key-secret');
     const ossBucketInput = document.getElementById('oss-bucket');
     const ossRegionInput = document.getElementById('oss-region');
-    
-    if (apikeyInput) apikeyInput.value = API_CONFIG.FASTGPT_CONTENT.apiKey || '';
+    if (styleApiKeyInput) styleApiKeyInput.value = API_CONFIG.FASTGPT_STYLE.apiKey || '';
     if (styleWorkflowInput) styleWorkflowInput.value = API_CONFIG.FASTGPT_STYLE.workflowId || '';
+    if (contentApiKeyInput) contentApiKeyInput.value = API_CONFIG.FASTGPT_CONTENT.apiKey || '';
     if (contentWorkflowInput) contentWorkflowInput.value = API_CONFIG.FASTGPT_CONTENT.workflowId || '';
     if (apiModeSelect) apiModeSelect.value = API_CONFIG.MODE || 'chat';
-    
     if (ossAccessKeyIdInput) ossAccessKeyIdInput.value = API_CONFIG.OSS.accessKeyId || '';
     if (ossAccessKeySecretInput) ossAccessKeySecretInput.value = API_CONFIG.OSS.accessKeySecret || '';
     if (ossBucketInput) ossBucketInput.value = API_CONFIG.OSS.bucket || '';
@@ -2360,74 +2353,27 @@ function loadConfigToForm() {
 }
 
 function saveConfig() {
-    console.log('💾 保存配置');
-    
-    try {
-        // 获取表单值
-        const apikey = document.getElementById('fastgpt-apikey')?.value || '';
-        const styleWorkflowId = document.getElementById('style-workflow-id')?.value || '';
-        const contentWorkflowId = document.getElementById('content-workflow-id')?.value || '';
-        const apiMode = document.getElementById('api-mode')?.value || 'chat';
-        
-        const ossAccessKeyId = document.getElementById('oss-access-key-id')?.value || '';
-        const ossAccessKeySecret = document.getElementById('oss-access-key-secret')?.value || '';
-        const ossBucket = document.getElementById('oss-bucket')?.value || '';
-        const ossRegion = document.getElementById('oss-region')?.value || '';
-        
-        // 更新配置
-        if (apikey) {
-            API_CONFIG.FASTGPT_STYLE.apiKey = apikey;
-            API_CONFIG.FASTGPT_CONTENT.apiKey = apikey;
-        }
-        
-        if (styleWorkflowId) {
-            API_CONFIG.FASTGPT_STYLE.workflowId = styleWorkflowId;
-        }
-        
-        if (contentWorkflowId) {
-            API_CONFIG.FASTGPT_CONTENT.workflowId = contentWorkflowId;
-        }
-        
-        API_CONFIG.MODE = apiMode;
-        
-        if (ossAccessKeyId) {
-            API_CONFIG.OSS.accessKeyId = ossAccessKeyId;
-        }
-        
-        if (ossAccessKeySecret) {
-            API_CONFIG.OSS.accessKeySecret = ossAccessKeySecret;
-        }
-        
-        if (ossBucket) {
-            API_CONFIG.OSS.bucket = ossBucket;
-        }
-        
-        if (ossRegion) {
-            API_CONFIG.OSS.region = ossRegion;
-        }
-        
-        // 保存到localStorage
-        localStorage.setItem('boss_kb_config', JSON.stringify(API_CONFIG));
-        
-        console.log('✅ 配置保存成功');
-        showToast('配置保存成功', 'success');
-        
-        // 如果配置了OSS，重新初始化
-        if (API_CONFIG.OSS.accessKeyId && API_CONFIG.OSS.accessKeySecret) {
-            initializeOSS().then(() => {
-                console.log('✅ OSS重新初始化成功');
-            }).catch(error => {
-                console.error('❌ OSS重新初始化失败:', error);
-            });
-        }
-        
-        // 关闭模态框
-        closeConfigModal();
-        
-    } catch (error) {
-        console.error('❌ 配置保存失败:', error);
-        showToast('配置保存失败: ' + error.message, 'error');
-    }
+    const styleApiKey = document.getElementById('style-api-key')?.value || '';
+    const styleWorkflowId = document.getElementById('style-workflow-id')?.value || '';
+    const contentApiKey = document.getElementById('content-api-key')?.value || '';
+    const contentWorkflowId = document.getElementById('content-workflow-id')?.value || '';
+    const apiMode = document.getElementById('api-mode')?.value || 'chat';
+    const ossAccessKeyId = document.getElementById('oss-access-key-id')?.value || '';
+    const ossAccessKeySecret = document.getElementById('oss-access-key-secret')?.value || '';
+    const ossBucket = document.getElementById('oss-bucket')?.value || '';
+    const ossRegion = document.getElementById('oss-region')?.value || '';
+    if (styleApiKey) API_CONFIG.FASTGPT_STYLE.apiKey = styleApiKey;
+    if (styleWorkflowId) API_CONFIG.FASTGPT_STYLE.workflowId = styleWorkflowId;
+    if (contentApiKey) API_CONFIG.FASTGPT_CONTENT.apiKey = contentApiKey;
+    if (contentWorkflowId) API_CONFIG.FASTGPT_CONTENT.workflowId = contentWorkflowId;
+    API_CONFIG.MODE = apiMode;
+    if (ossAccessKeyId) API_CONFIG.OSS.accessKeyId = ossAccessKeyId;
+    if (ossAccessKeySecret) API_CONFIG.OSS.accessKeySecret = ossAccessKeySecret;
+    if (ossBucket) API_CONFIG.OSS.bucket = ossBucket;
+    if (ossRegion) API_CONFIG.OSS.region = ossRegion;
+    localStorage.setItem('boss_kb_config', JSON.stringify(API_CONFIG));
+    showToast('配置保存成功', 'success');
+    loadConfigToForm();
 }
 
 function clearAllConfig() {
