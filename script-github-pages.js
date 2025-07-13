@@ -718,10 +718,13 @@ async function callChatCompletions(messages, chatId, variables, apiKey, workflow
 
 // 内容生成功能
 async function generateContent() {
-    const contentLength = parseInt(document.getElementById('content-length').value) || 500;
+    const contentLength = parseInt(document.getElementById('word-count').value) || 500;
     const topic = document.getElementById('topic').value.trim();
-    const styleType = document.getElementById('style-type').value;
-    const remark = document.getElementById('remark').value.trim();
+    const styleType = '文章'; // 默认类型，因为HTML中没有style-type选择器
+    const remark = document.getElementById('notes').value.trim();
+    
+    console.log('🔄 开始内容生成:', { contentLength, topic, styleType, remark });
+    console.log('📊 当前风格分析结果:', appState.styleOutput);
     
     if (!topic) {
         showToast('请输入主题内容', 'warning');
