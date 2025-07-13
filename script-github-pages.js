@@ -298,15 +298,21 @@ async function callContentGenerationWorkflow(styleOutput, contentLength, topic, 
     const result = await response.json();
     console.log('✅ FastGPT内容生成工作流响应:', result);
     
+    // 优先处理工作流返回的newVariables.AIcontent_output
     if (result?.newVariables?.AIcontent_output) {
+        console.log('📝 获取到工作流输出变量AIcontent_output:', result.newVariables.AIcontent_output);
         return result.newVariables.AIcontent_output;
     }
     
+    // 备选：处理标准chat completion格式
     if (result?.choices?.[0]?.message?.content) {
+        console.log('📝 获取到标准chat completion内容:', result.choices[0].message.content);
         return result.choices[0].message.content;
     }
     
-    throw new Error('无法从工作流获取内容生成结果');
+    // 调试：输出完整响应结构
+    console.error('❌ 无法从响应中提取内容，完整响应:', JSON.stringify(result, null, 2));
+    throw new Error('无法从工作流获取内容生成结果，请检查工作流配置');
 }
 
 // 文件上传功能
@@ -748,6 +754,15 @@ async function generateContent() {
     }
     
     appState.isGenerating = true;
+    
+    // 获取生成按钮并更新状态
+    const generateBtn = document.querySelector('.generate-btn');
+    if (generateBtn) {
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在生成内容...';
+        generateBtn.classList.add('loading');
+    }
+    
     updateAnalysisStatus('正在生成内容...');
     checkLearningButtonStatus();
     
@@ -767,6 +782,10 @@ async function generateContent() {
             throw new Error('请设置正确的接口模式（chat 或 workflow）');
         }
         
+        if (!generatedContent) {
+            throw new Error('生成的内容为空');
+        }
+        
         appState.generatedContent = generatedContent;
         showGeneratedContent(generatedContent);
         showToast('内容生成完成', 'success');
@@ -777,6 +796,14 @@ async function generateContent() {
         updateAnalysisStatus('内容生成失败，请检查配置');
     } finally {
         appState.isGenerating = false;
+        
+        // 恢复按钮状态
+        if (generateBtn) {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = '<i class="fas fa-robot"></i> 生成专属内容';
+            generateBtn.classList.remove('loading');
+        }
+        
         checkLearningButtonStatus();
     }
 }
@@ -792,15 +819,37 @@ async function generateContentWithChat(styleOutput, contentLength, topic, styleT
 
 // 显示生成的内容
 function showGeneratedContent(content) {
+    console.log('📝 显示生成的内容:', content);
+    
+    // 显示结果区域
+    const resultSection = document.getElementById('result-section');
+    if (resultSection) {
+        resultSection.style.display = 'block';
+    }
+    
+    // 更新结果内容
     const resultContent = document.getElementById('result-content');
     if (resultContent) {
-        resultContent.innerHTML = marked.parse(content);
-        resultContent.style.display = 'block';
-        
-        // 代码高亮
-        document.querySelectorAll('pre code').forEach((block) => {
-            hljs.highlightBlock(block);
-        });
+        try {
+            // 使用marked库渲染Markdown
+            const renderedContent = marked.parse(content);
+            resultContent.innerHTML = renderedContent;
+            resultContent.style.display = 'block';
+            
+            // 代码高亮
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+            
+            console.log('✅ 内容显示成功');
+        } catch (error) {
+            console.error('❌ Markdown渲染失败:', error);
+            // 如果Markdown渲染失败，直接显示原始内容
+            resultContent.innerHTML = `<pre>${content}</pre>`;
+            resultContent.style.display = 'block';
+        }
+    } else {
+        console.error('❌ 未找到result-content元素');
     }
 }
 
@@ -1323,7 +1372,61 @@ document.addEventListener('DOMContentLoaded', async function() {
     loadConfigFromStorage();
     
     // 设置默认风格，确保系统始终可用
-    appState.styleOutput = '正式严谨，条理清晰，用词准确，逻辑性强，表达规范';
+    const defaultStyle = `### 深度写作风格报告
+
+**一、 风格DNA提炼**
+* 这是一种结合专业见解与生动案例的务实写作风格，以通俗易懂且风趣幽默的语言，围绕AI时代产品经理如何把握用户需求展开深入探讨，兼具实用性与趣味性。
+
+**二、 风格元素全景解析**
+
+**Part 1: 作者视角与身份**
+* **🕵️‍♂️ 人称运用:**
+    * 基本人称: 以第一人称"我"为主，如"我观察身边同学""我在团队也常说一句话"等，让读者感受到作者的亲身参与感。
+    * 身份指代: 使用特定昵称"镜哥"代替"我"，增强个人风格与辨识度。
+    * *原文示例:* "镜哥觉得，这就像是给一个老式拖拉机装上了F1赛车的引擎……"
+* **🔭 视角距离:** 作者是沉浸其中的参与者视角，通过分享亲身经历的项目案例，如报修工单模块的优化过程，拉近与读者的距离，使读者更易产生共鸣。
+    * *原文示例:* "咱们来看一个团队早年间做过的、前段时间优化过的、现在看来特别有意思的项目——一个垂直领域的报修工单模块。"
+
+**Part 2: 情感基调与语言温度**
+* **🌡️ 整体氛围:**
+    * 核心基调: 活泼风趣与严肃理性并存。在描述现象时语言幽默，如"每天叫醒我的不是闹钟，也不是梦想，而是一堆又一堆的AI新名词和刷屏级的应用"；在阐述观点和分析问题时严肃认真，如对如何把握用户真实需求的探讨。
+    * 情感强度: 情感表达较为含蓄但富有感染力，通过生动的比喻和具体案例传递观点，引发读者思考。
+* **🗣️ 语言温度与特征词:**
+    * 语气词/口头禅: 高频使用"于是乎""你看"等语气词和口头禅，增强语言的口语化和流畅感。
+    * *原文示例:* "于是乎，一个怪现象出现了：为了AI而AI。""你看，技术在变，但驱动人心的底层逻辑，千百年来，从未改变。"
+    * 情绪副词/形容词: 偏爱使用"华丽丽""完美""立竿见影"等情绪副词和形容词，生动形象地表达观点和描述结果。
+    * *原文示例:* "然后，产品就华丽丽地……上线了。""我们当时觉得，这多牛啊，逻辑多严谨呀，堪称完美！""这个小小的改动，效果立竿见影。"
+
+**Part 3: 词汇与句法构造**
+* **🎨 词汇调色板:**
+    * 领域与体裁: 词汇融合商业、技术与生活领域，兼具书面语体与口语语体特点。既使用专业术语如"大语言模型""信息提取"，也有通俗易懂的生活词汇如"手指头粗""麻烦"等。
+    * 词语偏好: 爱用成语、网络热词和形象的词组，如"削铁如泥""高摩擦、反人性""AI-Powered"等，使文章更具时代感和表现力。
+    * *原文示例:* "兴奋的是，手里似乎多了一把削铁如泥的'屠龙刀'""我们自以为高效的流程，在用户的真实场景里，却是一个'高摩擦、反人性'的设计""你要是不在产品方案里加个'AI-Powered'的标签，咱出门都不好意思跟人打招呼。"
+* **🔨 句式工具箱:**
+    * 长短句分布: 长短句交错形成节奏感。长句用于详细阐述观点和复杂的业务逻辑，如"系统后台通过语音识别将语音转成文字，再调用大语言模型，对这段自然语言进行'信息提取'"；短句用于突出重点和增强语气，如"为啥？""不。"
+    * 标志性句式: 高频使用设问句，如"这有价值吗？当然有。""怎么办？难道要放弃这部分'顽固'的用户吗？不。"引发读者思考，引导行文节奏。
+    * *原文示例:* "很多产品都在做'AI智能总结'，把一篇长文、一个视频，一键总结成几百字。这有价值吗？当然有。"
+
+**Part 4: 结构与逻辑流**
+* **🗺️ 结构蓝图:**
+    * 篇章结构: 采用"观点-论据"的结构。开篇提出AI时代产品经理面临的问题及要探讨的核心观点，即如何从用户真实需求出发；然后通过报修工单模块的案例及多个例子进行论证；最后总结强调产品经理应回归核心价值。
+    * 段落构造: 段落平均长度适中，喜欢用短段落制造呼吸感，使文章层次清晰，便于阅读，如在描述报修工单模块的三个阶段时，每个阶段都独立成段进行详细阐述。
+* **🔗 逻辑衔接:**
+    * 常用过渡词: 使用"首先""其次""然后""但是""反之"等标志性过渡词，使文章逻辑连贯，如"首先，深入场景，做'田野调查'，而不是'键盘侠'""其次，拥抱'懒惰'，做'效率的偏执狂'"。
+    * *原文示例:* "首先，深入场景，做'田野调查'，而不是'键盘侠'"
+    * 隐性过渡: 通过重复关键词，如"AI""用户需求"等，以及逻辑上的因果、递进关系实现自然衔接，如在阐述AI在不同场景下的应用时，围绕AI对用户需求的满足层层递进。
+
+**Part 5: 修辞与表达技巧**
+* **✨ 表达增强器:**
+    * 修辞手法: 常用比喻、引用等修辞手法。比喻如"这就像是给一个老式拖拉机装上了F1赛车的引擎"，使抽象的概念更形象易懂；引用如引用傅盛的观点、梁宁老师在书中的论述，增强观点的权威性。
+    * *原文示例:* "镜哥觉得，这就像是给一个老式拖拉机装上了F1赛车的引擎，听起来很猛，实际上路跑两圈，要么自己散架，要么把地耕得一塌糊涂。""前两天刚好听了猎豹傅盛傅总的一期播客，他有个观点我深以为然：AI时代，应用和体验才是真正的价值高地。"
+    * 论证方式: 偏爱讲述故事/案例和援引名人名言来支撑观点。通过报修工单模块的案例详细说明如何从用户需求出发进行产品优化；引用傅盛、梁宁的观点为论点提供理论依据。
+    * *原文示例:* "咱们来看一个团队早年间做过的、前段时间优化过的、现在看来特别有意思的项目——一个垂直领域的报修工单模块。""这也让我想起了梁宁老师在《真需求》这本书里反复强调的——要洞察用户真实的需求，而不是停留在表面的'要什么'。"`;
+    
+    appState.styleOutput = defaultStyle;
+    
+    // 显示默认风格
+    showStyleAnalysis(defaultStyle);
     
     // 检查API连接状态
     await checkAPIConnection();
